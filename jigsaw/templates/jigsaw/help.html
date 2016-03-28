@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{% trans 'Help' %} | Jiggly</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            background: url("{% static 'images/spring_bokeh.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding-top: 17em;
+            border-radius: 0;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <h1>{% trans "Jiggly" %}</h1>
+            <p>{% trans "The Learning Game." %}</p>
+            {% include 'jigsaw/quick_join.html' %}
+        </div>
+        <div class="row">
+            <h2>{% trans "Jiggly Help" %}</h2>
+            <p>
+                {% trans "Coming soon" %}<br />
+            </p>
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+</body>
+</html>

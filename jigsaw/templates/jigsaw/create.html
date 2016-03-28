@@ -1,0 +1,124 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{% trans 'Start Game' %} | Jiggly</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding:17em 0 9em;
+            border-radius: 0;
+            text-align:center;
+            position: relative;
+        }
+        #site-body .input-group, #site-body .dropdown{
+            width:50%;
+            min-width:250px;
+            margin:auto; 
+            margin-bottom:3px;
+            margin-top:10px;
+            text-align:center;
+        }
+        #site-body .dropdown-menu {
+            width:200px;
+            left: 50%;
+            margin-left:-100px;
+            text-align:center;
+        }
+        .round-row {
+            padding: 0.5em 15px;
+            -moz-transition: background-color 1s ease;
+            -o-transition: background-color 1s ease;
+            -webkit-transition: background-color 1s ease;
+            transition: background-color 1s ease;
+            border-radius: 10px;
+            margin-bottom: 3em;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <h2 id="lb-game-name">{% trans 'Start A New Game' %}</h2><br />
+            <div class="input-group" id="alias">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-tags" id="addon-alias" title="{% trans " Game Alias" %}"></span></span>
+
+                <input type="text" id="tb-alias" class="form-control" maxlength=100
+                        placeholder="{% trans " Game Alias"%}" aria-describedby="basic-addon2" value="{{ base.defaultAlias }}">
+            </div>
+            <label style="color:#ffaaaa" id="lb-warning"></label><br />
+            <div class="input-group" id="host">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-user" id="addon-host" title="{% trans " Host Name" %}"></span></span>
+
+                <input type="text" id="tb-host" class="form-control" maxlength=100 placeholder="{% trans " Host Name"%}" aria-describedby="basic-addon2" value="{{ base.creator }}">
+            </div><br />
+            <div class="dropdown" title="
+            {% trans "Public: Visible on the public games list" %}
+            {% trans "Private: Hidden from the public games list but joinable with a code" %}<br/>
+            ">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-eye-open"></span> <span id="lb-public">{% if public %}{% trans 'Public' %}{% else %}{% trans 'Private' %}{% endif %}</span>
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+            <li><a id="btn-public">{% trans 'Public' %}</a></li>
+            <li><a id="btn-private">{% trans 'Private' %}</a></li>
+            </ul>
+            </div><br />
+            <button class="btn btn-danger" style="vertical-align:middle" id="btn-create" title="{% trans 'Create' %}">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                {% trans "Create" %}
+            </button>
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btn-public').click(function () {
+                $('#lb-public').text("{% trans 'Public' %}");
+            });
+            $('#btn-private').click(function () {
+                $('#lb-public').text("{% trans 'Private' %}");
+            });
+            $('#btn-create').click(function () {
+                createGameInstance("{{ base.id }}", $('#tb-alias').val(), $('#tb-host').val(), $('#lb-public').text() == 'Public', 1800, function () {
+                    setPermCookie('psessionid', 0);
+                    setPermCookie('instancemankey', "{{ base.key }}");
+                    window.location.href = "{% url 'scoreboard' %}";
+                });
+            });
+            $('#tb-alias').on('input', function () {
+                checkAlias();
+            });
+            checkAlias();
+        })
+        function checkAlias() {
+            if ($('#tb-alias').val().trim() == "") {
+                $('#lb-warning').text("{% trans 'Alias cannot be empty.' %}");
+                $('#btn-create').hide();
+                return;
+            }
+            ajaxGet('/ajax_aliasexists/', { 'alias': $('#tb-alias').val() }, function (content) {
+                if (content == 1) {
+                    $('#btn-create').hide();
+                    $('#lb-warning').text("{% trans 'Alias already in use, please choose a different one.' %}");
+                }
+                else {
+                    $('#btn-create').show();
+                    $('#lb-warning').text("");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

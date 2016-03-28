@@ -1,0 +1,33 @@
+{% load i18n %}
+<style type="text/css">
+.btn.focus, .btn:focus, .btn:hover {
+    color: #eee;
+    text-decoration: none;
+}
+</style>
+<div id="quick-join">
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon2"><i class="glyphicon glyphicon-log-in" title="{% trans " Join" %}"></i></span>
+        <input type="text" class="form-control" id="tb-join-alias" placeholder="{% trans "Game Alias"%}" aria-describedby="basic-addon2">
+        <input type="text" class="form-control" id="tb-join-name" placeholder="{% trans "Player Name"%}" aria-describedby="basic-addon2">
+        <span class="input-group-btn" style="height:68px;padding:0">
+            <button class="btn btn-secondary" style="height:100%;padding:0 20px" type="button" onclick="_join()">{% trans "Go" %}</button>
+        </span>
+    </div>
+    <label style="color:#a33; line-height:30px;height:30px;position:absolute;min-height:30px;width:100%;text-align:center" id="lb-warning"></label>
+</div>
+<script type="text/javascript">
+    function _join() {
+        var alias = $('#tb-join-alias').val();
+        var name = $('#tb-join-name').val();
+        ajaxPost('/ajax_startsession/', { 'alias': alias, 'name': name }, function (content) {
+            if (content) {
+                setPermCookie('psessionid', content);
+                window.location.href = "{% url 'scoreboard' %}";
+            }
+            else {
+                $('#lb-warning').text("{% trans 'Invalid game alias' %}");
+            }
+        });
+    }
+</script>

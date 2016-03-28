@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load staticfiles %}
+{% load report %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{% trans 'Report' %} | Jiggly</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            color: #111;
+            padding-top: 5em;
+            padding-bottom: 2em;
+            border-radius: 0;
+            position: relative;
+        }
+
+        #site-banner .btn.pull-right {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <button class="btn btn-warning pull-right" style="vertical-align:middle" id="btn-leave" title="{% trans 'Leave' %}" 
+                    onclick="{% if not round and not supervisor %}noCloseWarning=true;{% endif %}
+                        {% if supervisor %}
+                         if (ended) 
+                             delGameInstance({{ instance.pk }})
+                         else
+                             endGameInstance({{ instance.pk }})
+                        {% else %}promptQuit()
+                    {% endif %};
+                     ">
+                <span id="btn-leave-icon" class="glyphicon glyphicon-log-out"></span>
+                <span id="btn-leave-text">{% if supervisor %}{% trans "End Game" %}{% else %}{% trans "Quit" %}{% endif %}</span>
+            </button>
+            <a class="btn btn-success pull-right" style="vertical-align:middle;margin-right:10px" id="btn-leave" title="{% trans 'Save / Print Report (PDF)' %}"
+                    onclick="noCloseWarning=true" href="{% url 'report_pdf' %}" target="_blank">
+                <span class="glyphicon glyphicon-save-file"></span>
+                {% trans "Save or Print (PDF)" %}
+            </a>
+            <button class="btn btn-primary pull-right" style="vertical-align:middle;margin-right:10px" id="btn-leave" title="{% trans 'Return to Scoreboard' %}"
+                    onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {% trans "Return to Scores" %}
+            </button>
+            {% if round and not supervisor %}
+            {% if round.order ==  1 %}
+            <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Start' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
+                <span class="glyphicon glyphicon-play"></span>
+                {% trans "Start" %}
+            </button>
+            {% else %}
+            <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
+                <span class="glyphicon glyphicon-play"></span>
+                {% trans "Continue" %}
+            </button>
+            {% endif %}
+            {% endif %}
+            {% if instance.system == True %}
+            <h3>{% trans "Report For: " %}{% trans "Preview / Practice Game" %}</h3>{% else %}
+            <h3>{% trans "Report For: " %} {{ instance.alias|safe }}</h3>{% endif %}
+        </div>
+        <div class="row">
+            {% if instance.system == True %}
+            <h3>{% trans "Report For Preview / Practice Game" %}</h3>{% else %}
+            <h3>{% if not supervisor %}{% trans "Report For" %} {% endif %}{{ instance.alias|safe }}</h3>{% endif %}
+            <h4>{{ game.name|safe }}</h4>
+            <h5>{% trans "Created by" %} {{ game.creator|safe }}</h5>
+            <h5>{% trans "Host: " %} {{ instance.host|safe }}</h5>
+            <h3>{% trans "Overall Rankings" %}</h3>
+            <table class="table table-hover">
+                <thead>
+                <th></th>
+                <th>
+                    {% trans 'Name' %}
+                </th>
+                <th>
+                    {% trans 'Points' %}
+                </th>
+                <th>
+                    {% trans 'Round' %}
+                </th>
+                </thead>
+                <tbody id="ranking-content">
+                    {% for p in instance.players.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.points }}</td>
+                        {% if p.round %}
+                        <td>{{ p.round.completeCount }} {% trans "of" %} {{ game.rounds.all|length }}</td>
+                        {% else %}
+                        <td>{% trans 'Finished' %}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td>{% trans 'Total Players:' %} {{ instance.players.all|length }}</td>
+                        <td>{% trans 'Max Points:' %} {{ instance.game.maxPoints }}</td>
+                        <td>{% trans 'Average Points:' %} {{ instance.averagePoints }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% if supervisor %}
+            <h3>{% trans "Details" %}</h3>
+            {% for pl in instance.players.all %}
+            <h4>{{ pl.name }}</h4>
+            {% for rr in pl.reports.all %}
+            <div class="row" style="margin:0">
+                <h5>{{ forloop.counter }}. {{ rr.round.name }}</h5>
+                <p>
+                    {% trans 'Points: ' %} {{ rr.points }} / {{ rr.maxPoints }}<br />
+                    {% trans 'Total points: ' %} {{ rr.totalpoints }}<br />
+                    {% trans 'Average points this round: ' %} {{ rr.averagePoints }}<br />
+                </p>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>{% trans 'Word' %}</th>
+                            <th>{% trans 'Definition or Related Entry' %}</th>
+                            <th>{% trans 'Points' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="words-list">
+                        {% for w in rr.round.words.all %}
+                        <tr{% if rr|correct:w.word %} class="correct" {% endif %}>
+                    <td>
+                        {% if rr|correct:w.word %}
+                        <span class="glyphicon glyphicon-ok" style="color:darkseagreen"></span>
+                        {% else %}
+                        <span class="glyphicon glyphicon-remove" style="color:indianred"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ w.word }}
+                    <td>
+                        {{ w.meaning }}
+                    </td>
+                    <td>
+                        {% if rr|correct:w.word %}
+                        {{ w.points }}
+                        {% else %}
+                        0
+                        {% endif %}
+                        / {{ w.points }}
+                    </td>
+                    </tr>
+                    {% endfor %}
+                    {% if rr.round.points > 0 %}
+                    <tr {% if rr.roundbonus %}
+                        class="correct"
+                        {% endif %}>
+                        <td>
+                            {% if rr.roundbonus %}
+                            <span class="glyphicon glyphicon-certificate" style="color:darkseagreen"></span>
+                            {% else %}
+                            <span class="glyphicon glyphicon-remove" style="color:indianred"></span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% trans "Perfect Round Bonus" %}
+                        </td>
+                        <td></td>
+                        <td>
+                            {% if rr.roundbonus %}
+                            {{ rr.round.points }}
+                            {% else %}
+                            0
+                            {% endif %}
+                            / {{ rr.round.points }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr class="awards">
+                        <td>
+                            <span class="glyphicon glyphicon-stats" style="color:orange"></span>
+                        </td>
+                        <td>
+                            {% trans "Total this round" %}
+                        </td>
+                        <td></td>
+                        <td>
+                            {{ rr.points }} / {{ rr.maxPoints }}
+                        </td>
+                    </tr>
+                    <tr class="awards">
+                        <td>
+                            <span class="glyphicon glyphicon-stats" style="color:darkseagreen"></span>
+                        </td>
+                        <td>
+                            {% trans "Total to this point" %}
+                        </td>
+                        <td></td>
+                        <td>
+                            {{ rr.totalpoints }} / {{ game.maxPoints }}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+</body>
+</html>

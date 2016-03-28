@@ -1,0 +1,153 @@
+body{
+    font-family: 'Imprima', sans-serif;
+}
+a, a.visited, a:focus, .btn-link, .btn-link:visited, .btn-link:focus{
+    color:#ff6a00;
+    outline: none;
+}
+.btn-link:focus,.btn-link:active,
+.btn-link:focus:hover,
+.btn-link:focus:active{
+    color:#ff0000;
+    outline: none;
+}
+a:hover, .btn-link:hover{
+    color:#ff0000
+}
+h1, h2, h3, h4, h5, h6, .emphasize{
+    font-family: 'Cantata One', serif;
+}
+/* for some characters imprima displays weirdly, so we can use this option */
+.sans-serif{
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+a,
+a label {
+    cursor: pointer;
+}
+
+/* navbar */
+#primary-nav {
+    background-color: #333;
+    border-bottom: none;
+}
+/* title */
+#primary-nav .navbar-brand {
+    color: #fff;
+}
+#primary-nav .navbar-brand:hover,
+#primary-nav .navbar-brand:focus {
+    color: #fff;
+}
+/* link */
+#primary-nav .navbar-nav > li > a {
+    color: #fff;
+}
+#primary-nav .navbar-nav > li > a:hover,
+#primary-nav .navbar-nav > li > a:focus {
+    color: #eee;
+}
+#primary-nav .navbar-nav > .active > a, 
+#primary-nav .navbar-nav > .active > a:hover, 
+#primary-nav .navbar-nav > .active > a:focus {
+    color: #ff6a00;
+    background-color: #333;
+}
+#primary-nav .navbar-nav > .open > a, 
+#primary-nav .navbar-nav > .open > a:hover, 
+#primary-nav .navbar-nav > .open > a:focus {
+    color: #ff6a00;
+    background-color: #333;
+}
+/* caret */
+#primary-nav .navbar-nav > .dropdown > a .caret {
+    border-top-color: #fff;
+    border-bottom-color: #fff;
+}
+#primary-nav .navbar-nav > .dropdown > a:hover .caret,
+#primary-nav .navbar-nav > .dropdown > a:focus .caret {
+    border-top-color: #fff;
+    border-bottom-color: #fff;
+}
+#primary-nav .navbar-nav > .open > a .caret, 
+#primary-nav .navbar-nav > .open > a:hover .caret, 
+#primary-nav .navbar-nav > .open > a:focus .caret {
+    border-top-color: #fff;
+    border-bottom-color: #fff;
+}
+/* mobile version */
+#primary-nav .navbar-toggle {
+    border: none;
+    color:#fff;
+}
+#primary-nav .navbar-toggle:hover,
+#primary-nav .navbar-toggle:focus {
+    background-color: #333;
+}
+#primary-nav .navbar-collapse{
+    border: none;
+}
+#primary-nav .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+/* main content */
+#site-body{
+    width:100%;
+    padding:0;
+}
+#site-body > div.row{
+    width:88%;
+    margin:auto;
+    padding: 2em 0;
+}
+#site-body > div.jumbotron{
+    padding: 5em 6%;
+    margin-bottom:0;
+}
+#site-banner div#quick-join {
+    width:30%;
+    min-width:250px;
+    position:absolute;
+    right: 6%;
+    bottom: 6.5em;
+}
+.input-group-addon,
+.input-group-btn button {
+    color: #fff;
+    background: #333;
+    border:1px solid #333;
+}
+input.auto-hide {
+    color: #eee;
+    -moz-transition: color 0.4s ease;
+    -o-transition: color 0.4s ease;
+    -webkit-transition: color 0.4s ease;
+    transition: color 0.4s ease;
+}
+input.auto-hide:hover{
+    color:#000;
+}
+@media (max-width: 767px) {
+    #primary-nav .navbar-nav .open .dropdown-menu > li > a {
+        color: #fff;
+    }
+    #primary-nav .navbar-nav .open .dropdown-menu > li > a:hover,
+    #primary-nav .navbar-nav .open .dropdown-menu > li > a:focus {
+        color: #fff;
+    }
+    #site-body div#quick-join {
+        width:90%;
+        position:relative;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+/* footer */
+#site-footer{
+    text-align:center;
+    padding: 1em 0;
+    background-color:#333;
+    color:#fff
+}

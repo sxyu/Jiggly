@@ -1,0 +1,339 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{% trans 'Print Round: ' %}{{ round.name|safe }} - {{ game.name|safe }} | Jiggly</title>
+    <style type="text/css">
+        @page {
+            size: 11in 8.5in;
+            margin: 0.5in 0.5in 0.5in 0.5in;
+        }
+
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, Times New Roman, serif;
+        }
+
+        .page {
+            margin: 0;
+            width: 10in;
+            height: 7.5in;
+            padding: 0.1in;
+            position: relative;
+            page-break-after: always;
+        }
+
+        .page > div.row {
+            padding: 0;
+            margin: auto;
+            width: 9.0in;
+            height: 1.8in;
+        }
+
+        div.cell {
+            display: inline-block;
+            width: 1.8in;
+            height: 100%;
+            position: relative;
+            margin: 0;
+            margin-left: -1px;
+            margin-top: -5px;
+            padding: 0;
+            border: 1px dashed #000;
+            border-top: none;
+            border-left: none;
+        }
+
+        div.cell.first-row {
+            border-top: 1px dashed #000;
+        }
+
+        div.cell.first-col {
+            border-left: 1px dashed #000;
+        }
+
+        div.cell p, div.footer {
+            display: block;
+            overflow: hidden;
+            -ms-text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+            text-overflow: ellipsis;
+            font-size: 11.5px;
+            max-height:32px;
+        }
+        p.top {
+            position: absolute;
+            top: 6px;
+            text-align: center;
+            width: 0.9in;
+            -moz-transform: rotate(180deg);
+            -ms-transform: rotate(180deg);
+            -o-transform: rotate(180deg);
+            -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+            -moz-transform-origin: 50% 50%;
+            -ms-transform-origin: 50% 50%;
+            -o-transform-origin: 50% 50%;
+            -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+            left:0.45in;
+        }
+
+        p.left {
+            -ms-transform: rotate(90deg) translateY(-100%);
+            -moz-transform: rotate(90deg) translateY(-100%);
+            -webkit-transform: rotate(90deg) translateY(-100%);
+            -o-transform: rotate(90deg) translateY(-100%);
+            transform: rotate(90deg) translateY(-100%);
+            -moz-transform-origin: left top 0;
+            -ms-transform-origin: left top 0;
+            -o-transform-origin: left top 0;
+            -webkit-transform-origin: left top 0;
+            transform-origin: left top 0;
+            width: 1.2in;
+            position: absolute;
+            text-align: center;
+            left: 6px;
+            top: 0.3in;
+        }
+
+        p.right {
+            width: 1.2in;
+            float: right;
+            -ms-transform: rotate(-90deg) translateY(-100%);
+            -moz-transform: rotate(-90deg) translateY(-100%);
+            -webkit-transform: rotate(-90deg) translateY(-100%);
+            -o-transform: rotate(-90deg) translateY(-100%);
+            transform: rotate(-90deg) translateY(-100%);
+            -moz-transform-origin: right top 0;
+            -ms-transform-origin: right top 0;
+            -o-transform-origin: right top 0;
+            -webkit-transform-origin: right top 0;
+            transform-origin: right top 0;
+            position: absolute;
+            right: 6px;
+            top: 0.3in;
+            text-align: center;
+        }
+
+        p.bottom {
+            position: absolute;
+            bottom: -4px;
+            text-align: center;
+            width:0.9in;
+            left:0.45in;
+        }
+
+        div.footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        @media screen {
+            body {
+                background-color: #444;
+                padding-top: 6em;
+            }
+
+            div#screen-header {
+                padding: 0 5em;
+                color: #fff;
+            }
+
+            div.page {
+                background-color: #fff;
+                width: 100%;
+                margin-top: 3em;
+                margin-bottom: 3em;
+                padding: 0.5in;
+                height: 8.5in;
+            }
+
+            div.footer {
+                bottom: 0.5in;
+                width: 94%;
+            }
+        }
+
+        @media print {
+            div.cell {
+                margin-top: -8px;
+            }
+
+            #primary-nav, #site-footer, .no-print {
+                display: none;
+            }
+        }
+    </style>
+    <script type="text/javascript" defer>
+        // Jigsaw-like document layout + print preview system by Alex Yu 2016
+        var body;
+        var curpage, currow, curcell, currowct;
+        var cellsPerRow = 5, rowsPerPage = 4;
+        var _lp, _rp, _tp, _bp;
+        var cells=0, rows=0, pages=0;
+        var words=[];
+        var footertext="{{ round.name|escapejs|safe }} - {{ game.name|escapejs|safe }} | <em>Jiggly</em> &copy; Alex Yu 2016";
+        var Side = {
+            LEFT: 0,
+            RIGHT: 1,
+            TOP: 2,
+            BOTTOM: 3,
+        };
+        function setText(pside, text) {
+            var elem = null;
+            switch (pside) {
+                case Side.LEFT:
+                    elem = _lp;
+                    break;
+                case Side.RIGHT:
+                    elem = _rp;
+                    break;
+                case Side.TOP:
+                    elem = _tp;
+                    break;
+                case Side.BOTTOM:
+                    elem = _bp;
+                    break;
+            }
+            if (elem) {
+                $(elem).text(text);
+                return true;
+            }
+            return false;
+        }
+        function printDocument(){
+            window.print();
+        }
+        function setFooter(html) {
+            $('.footer').each(function(){$(this).html(html)});
+        }
+        function nextPage() {
+            curpage = document.createElement("div");
+            body.appendChild(curpage);
+            jqpage = $(curpage);
+            jqpage.addClass('container');
+            jqpage.addClass('page');
+            foot = document.createElement("div");
+            curpage.appendChild(foot);
+            $(foot).addClass('footer');
+            pages++;
+            rows = 0;
+            cells = 0;
+            setFooter(footertext);
+        }
+        function nextRow() {
+            if (rows >= rowsPerPage) nextPage();
+            currow = document.createElement("div");
+            curpage.appendChild(currow);
+            jqrow = $(currow);
+            jqrow.addClass('row');
+            rows++;
+            cells = 0;
+        }
+        function nextCell() {
+            if (cells >= cellsPerRow) nextRow();
+            curcell = document.createElement("div");
+            currow.appendChild(curcell);
+            jqcell = $(curcell);
+            jqcell.addClass('cell');
+            if (rows == 1)
+                jqcell.addClass('first-row');
+            if (cells == 0)
+                jqcell.addClass('first-col');
+
+            _lp = document.createElement("p");
+            _rp = document.createElement("p");
+            _tp = document.createElement("p");
+            _bp = document.createElement("p");
+
+            curcell.appendChild(_lp);
+            curcell.appendChild(_rp);
+            curcell.appendChild(_tp);
+            curcell.appendChild(_bp);
+
+            $(_lp).addClass('left');
+            $(_rp).addClass('right');
+            $(_tp).addClass('top');
+            $(_bp).addClass('bottom');
+
+            cells ++;
+        }
+        function readInput() {
+            // 'read input' from server-side code
+            {% for w in round.words.all %}
+            words.push(["{{ w.word|escapejs|safe }}", "{{ w.meaning|escapejs|safe }}"]);{% endfor %}
+        }
+        function layoutWords(){
+            nextPage();
+            nextRow();
+            if (!words.length) return;
+            if (words.length <= 4){
+                cellsPerRow=2;
+            }
+            else if (words.length <= 12){
+                cellsPerRow=3;
+            }
+            else if (words.length <= 24){
+                cellsPerRow=4;
+            }
+            var vwordsPerRow = cellsPerRow-1;
+            var wordsPerRow = 2*cellsPerRow-1;
+            var cellsPerPage = (cellsPerRow-1) * rowsPerPage + (rowsPerPage-1) * cellsPerRow;
+            for (var p=0; p<words.length+cellsPerRow; p+=cellsPerPage + cellsPerRow){
+                for (var r=p; r<p+cellsPerPage; r+=wordsPerRow){
+                    if (r >= words.length+cellsPerRow)
+                        break;
+                    for (var i=r; i<r+cellsPerRow; ++i){
+                        if (i-cellsPerRow >= words.length || (i < cellsPerRow && i > words.length) ) break;
+                        nextCell();
+                        if (i != r && i-1 < words.length)
+                            setText(Side.LEFT, words[i-1][1]);
+                        if (i != r+cellsPerRow-1 && i < words.length){
+                            setText(Side.RIGHT, words[i][0]);
+                        }
+                        if (r != 0 && i-5 < words.length)
+                            setText(Side.TOP, words[i-cellsPerRow][1]);
+                        if (i+vwordsPerRow < words.length)
+                            setText(Side.BOTTOM, words[i+vwordsPerRow][0]);
+                    }
+                }
+            }
+        }
+        $(document).ready(function () {
+            body = document.getElementById('document-body');
+            $('#btn-print').click(printDocument);
+            readInput();
+            layoutWords();
+            $('.row').each(function(){
+                $(this).css('width', cellsPerRow * 1.8 + 'in');
+            });
+            var GET = window.location.search.replace("?", "").split('&');
+            for (var i=0; i<GET.length; ++i){
+                var eq = GET[i].split('=');
+                if (eq[0] == 'print' && eq.length == 2 && eq[1] == 'true'){
+                    printDocument();
+                    break;
+                }
+            }
+        })
+    </script>
+</head>
+<body>
+    <div id="document-body">
+        {% include 'jigsaw/header.html' %}
+        <div class="no-print" id="screen-header">
+            <button class="btn btn-primary pull-right" style="vertical-align:middle" id="btn-print" title="{% trans 'Print' %}">
+                <span class="glyphicon glyphicon-print"></span>
+            </button>
+            <h3 class="no-print">{% trans "Print Preview" %}</h3>
+            <h4 class="no-print">{{ round.name|safe }} - {{ game.name|safe }}</h4>
+            <p class="no-print"> &copy; Alex Yu 2016<p />
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+</body>
+</html>

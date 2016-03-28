@@ -1,0 +1,66 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>Jiggly | {% trans "The Learning Game" %}</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding-top: 17em;
+            border-radius: 0;
+            position:relative;
+        }
+		.team-image{
+			max-width:100%;
+		}
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <h1>{% trans "Jiggly" %}</h1>
+            <p>{% trans "The Learning Game." %}</p>
+            {% include 'jigsaw/quick_join.html' %}
+        </div>
+        <div class="row">
+            <h1>{% trans "Welcome to Jiggly" %}</h1>
+            <p>
+                {% trans "Jiggly is the ultimate interactive jigsaw puzzle game!" %}<br />
+                {% trans "Play to learn a new language, expand your vocabulary, or have fun with your friends!" %}<br />
+                {% trans "Jiggly is free to play. No registration required, so just jump right in and create or join a game." %}
+            </p>
+        </div>
+        <div class="row">
+            <h2>{% trans "Meet The Team" %}</h2>
+            <div class="row">
+                <a class="popup" href="{% static 'images/a_yu_full.jpg' %}"><img class="col-sm-2 img-rounded team-image" src="{% static 'images/a_yu.jpg' %}" title="Alex Yu" alt="Alex Yu" /></a>
+                <div class="col-sm-8">
+                    <h3>
+                        {% trans "Alex Yu" %}<br />
+                        <small>{% trans 'Co-founder' %} | {% trans 'Chief Information Officer' %}</small>
+                    </h3>
+                </div>
+            </div><br />
+            <div class="row">
+                <a class="popup" href="{% static 'images/a_singh_full.jpg' %}"><img class="col-sm-2 img-rounded team-image" src="{% static 'images/a_singh.jpg' %}" title="Aish Singh" alt="Aish Singh" /></a>
+                <div class="col-sm-8">
+                    <h3>
+                        {% trans "Aish Singh" %}<br />
+                        <small>{% trans 'Co-founder' %} | {% trans 'Director of Education and User Experience' %}</small>
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+</body>
+</html>

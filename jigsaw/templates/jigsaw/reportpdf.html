@@ -1,0 +1,144 @@
+{% extends "easy_pdf/base.html" %}
+{% load i18n %}
+{% load report %}
+
+{% block content %}
+    <div>
+        <div>
+            <h3><em><font size="11pt">Jiggly</font></em>  {% trans 'The Learning Game.' %}</h3>
+            {% if instance.system == True %}
+            <h3><font size="14pt">{% trans "Report For:" %} {% trans "Preview / Practice Game" %}</font></h3>{% else %}
+            <h3><font size="14pt">{% trans "Report For:" %} {{ instance.alias|safe }}</font></h3>{% endif %}
+            <p>{{ game.name|safe }}<br/>
+            {% trans "Created by" %} {{ game.creator|safe }}</p>
+            <h5>{% trans "Host: " %} {{ instance.host|safe }}</h5>
+            <h3><font size="13pt">{% trans "Overall Rankings" %}</font></h3>
+            <table>
+                <thead>
+                <th align="left">{% trans 'Rank' %}</th>
+                <th align="left">
+                    {% trans 'Name' %}
+                </th>
+                <th align="left">
+                    {% trans 'Points' %}
+                </th>
+                <th align="left">
+                    {% trans 'Round' %}
+                </th>
+                </thead>
+                <tbody>
+                    {% for p in instance.players.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td align="left">{{ p.name }}</td>
+                        <td align="left">{{ p.points }}</td>
+                        {% if p.round %}
+                        <td align="left">{{ p.round.completeCount }} {% trans "of" %} {{ game.rounds.all|length }}</td>
+                        {% else %}
+                        <td>{% trans 'Finished' %}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td>{% trans 'Total Players:' %} {{ instance.players.all|length }}</td>
+                        <td>{% trans 'Max Points:' %} {{ instance.game.maxPoints }}</td>
+                        <td>{% trans 'Average Points:' %} {{ instance.averagePoints }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% if supervisor %}
+            <h3><font size="13pt">{% trans "Details" %}</font></h3>
+            {% for pl in instance.players.all %}
+            <h4><font size="11pt">{{ pl.name }}</font></h4>
+            {% for rr in pl.reports.all %}
+            <div>
+                <h5>{{ forloop.counter }}. {{ rr.round.name }}</h5>
+                <p>
+                    {% trans 'Points: ' %} {{ rr.points }} / {{ rr.maxPoints }}<br />
+                    {% trans 'Total points: ' %} {{ rr.totalpoints }}<br />
+                    {% trans 'Average points this round: ' %} {{ rr.averagePoints }}<br />
+                </p>
+                <table>
+                  <colgroup>
+                    <col span="2" style="background-color:red">
+                    <col style="background-color:yellow">
+                  </colgroup>
+                    <thead>
+                        <tr>
+                            <th align="left">{% trans 'Word' %}</th>
+                            <th align="left">{% trans 'Definition or Related Entry' %}</th>
+                            <th align="left">{% trans 'Points' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for w in rr.round.words.all %}
+                        <tr>
+                    <td>
+                        {% if rr|correct:w.word %}
+                        <font color="darkseagreen">
+                            {{ w.word }}</font>
+                        {% else %}
+                            {{ w.word }}
+                        {% endif %}
+                    <td>
+                        {% if rr|correct:w.word %}
+                        <font color="darkseagreen">
+                            {{ w.meaning }}</font>
+                        {% else %}
+                            {{ w.meaning }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if rr|correct:w.word %}
+                        <font color="darkseagreen">
+                            {{ w.points }} / {{ w.points }}</font>
+                        {% else %}
+                        0 / {{ w.points }}
+                        {% endif %}
+                    </td>
+                    </tr>
+                    {% endfor %}
+                    {% if rr.points > 0 %}
+                    <tr> 
+                        <td>
+                            {% trans "Perfect Round Bonus" %}
+                        </td>
+                        <td></td>
+                        <td>
+                            {% if rr.roundbonus %}
+                            {{ rr.round.points }}
+                            {% else %}
+                            0
+                            {% endif %}
+                            / {{ rr.round.points }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>
+                            <strong>{% trans "Total this round" %}</strong>
+                        </td>
+                        <td></td>
+                        <td>
+                            <strong>{{ rr.points }} / {{ rr.maxPoints }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>{% trans "Total to this point" %}</strong>
+                        </td>
+                        <td></td>
+                        <td>
+                            <strong>{{ rr.totalpoints }} / {{ game.maxPoints }}</strong>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

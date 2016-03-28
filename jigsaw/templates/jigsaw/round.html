@@ -1,0 +1,78 @@
+{% load i18n %}
+{% load staticfiles %}
+<div class="row round-row" id="row-rnd-{{ round.pk }}">
+    <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-del" onclick="del_round({{ round.pk }})" title="{% trans 'Delete' %}"><span class="glyphicon glyphicon-trash link-warning"></span></button>
+    <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-down" onclick="move_round_down({{ round.pk }})" title="{% trans 'Move Down' %}"><span class="glyphicon glyphicon-arrow-down"></span></button>
+    <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-up" onclick="move_round_up({{ round.pk }})" title="{% trans 'Move Up' %}"><span class="glyphicon glyphicon-arrow-up"></span></button>
+    <a href="/print/{{ game.key }}-{{ round.pk }}/" target="_blank" title="{% trans 'Print' %}">
+        <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-print">
+            <span class="glyphicon glyphicon-print"></span>
+        </button>
+    </a>
+    <h4>
+        <span style="display:inline-block; vertical-align:middle" id="lb-rnd-name-{{ round.pk }}">{{ round.name }}</span>
+    </h4>
+    <p>{% trans 'Round Name' %}</p>
+    <div class="input-group" id="rnd-name">
+        <span class="input-group-addon"><span class="glyphicon glyphicon-tags" id="addon-name" title="{% trans "Round Name" %}"></span></span>
+
+        <input type="text" id="tb-rnd-{{ round.pk }}-name" maxlength=50 class="form-control" oninput="update_round_name({{ round.pk }})"
+               placeholder="{% trans " Round Name"%}" aria-describedby="basic-addon2" value="{{ round.name }}" />
+    </div><br />
+    <p>{% trans 'Perfect Round Bonus' %}</p>
+    <div class="dropdown" title="
+         {% trans "The number of points players gain after they complete this round perfectly" %}
+         ">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-certificate"></span> <span id="lb-rnd-points-{{ round.pk }}">{{ round.points }}</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a id="btn-rnd-{{ round.pk }}-0pt" onclick="update_round_points({{ round.pk }},0)">0</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-25pt" onclick="update_round_points({{ round.pk }},25)">25</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-50pt" onclick="update_round_points({{ round.pk }},50)">50</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-75pt" onclick="update_round_points({{ round.pk }},75)">75</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-100pt" onclick="update_round_points({{ round.pk }},100)">100</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-125" onclick="update_round_points({{ round.pk }},125)">125</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-150pt" onclick="update_round_points({{ round.pk }},150)">150</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-200pt" onclick="update_round_points({{ round.pk }},200)">200</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-300pt" onclick="update_round_points({{ round.pk }},300)">300</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-600pt" onclick="update_round_points({{ round.pk }},600)">600</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-900pt" onclick="update_round_points({{ round.pk }},900)">900</a></li>
+            <li><a id="btn-rnd-{{ round.pk }}-1200pt" onclick="update_round_points({{ round.pk }},1200)">1200</a></li>
+        </ul>
+    </div><br />
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>{% trans 'Word' %}</th>
+                <th>{% trans 'Definition or Related Entry' %}</th>
+                <th>{% trans 'Points' %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="rnd-{{ round.pk }}-words-list">
+            {% for word in round.words.all %}
+            <tr id="tr-wd-{{ word.pk }}">
+                <td>
+                    <input type="text" id="tb-wd-{{ word.pk }}-word" maxlength=150 class="form-control" value="{{ word.word }}" oninput="update_word_word({{ word.pk }})" />
+                </td>
+                <td>
+                    <input type="text" id="tb-wd-{{ word.pk }}-meaning" maxlength=250 class="form-control" value="{{ word.meaning }}" oninput="update_word_meaning({{ word.pk }})" />
+                </td>
+                <td>
+                    <input type="number" id="tb-wd-{{ word.pk }}-points" maxlength=9 class="form-control" value="{{ word.points }}" onkeydown="verifyNumeric()" oninput="update_word_points({{ word.pk }})" onchange="update_word_points({{ word.pk }})" />
+                </td>
+                <td>
+                    <button class="btn btn-link" id="btn-wd-{{ word.pk }}-del" onclick="del_word({{ word.pk }}, {{ round.pk }})"><span class="glyphicon glyphicon-trash link-warning"></span></button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button{% if round.words.all|length >= 31 %}
+        style="display:none"{% endif %}
+        class="btn btn-warning pull-right" id="btn-add-word-{{ round.pk }}" type="button" onclick="add_round_word({{ round.pk }})">
+        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add Word' %}
+	</button>
+</div>

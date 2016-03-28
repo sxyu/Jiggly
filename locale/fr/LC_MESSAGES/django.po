@@ -1,0 +1,866 @@
+# Jiggly French translation
+# Copyright (C) 2016 Alex Yu
+# This file is distributed under the same license as the Jiggly package.
+# Alex Yu <alexyu99126@gmail.com>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-03-18 20:08-0700\n"
+"PO-Revision-Date: 2016-03-17 08:54+8\n"
+"Last-Translator: ALEX YU <alexyu99126@gmail.com>\n"
+"Language-Team: French <alexyu.cf>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: jigsaw/templates/jigsaw/create.html:6
+msgid "Start Game"
+msgstr "Commencer un jeu"
+
+#: jigsaw/templates/jigsaw/create.html:51
+msgid "Start A New Game"
+msgstr "Commencer un nouveau jeu"
+
+#: jigsaw/templates/jigsaw/create.html:53
+#: jigsaw/templates/jigsaw/create.html:56 jigsaw/templates/jigsaw/join.html:56
+msgid " Game Alias"
+msgstr "ID de jeu"
+
+#: jigsaw/templates/jigsaw/create.html:60
+#: jigsaw/templates/jigsaw/create.html:62 jigsaw/templates/jigsaw/game.html:73
+#: jigsaw/templates/jigsaw/join.html:62
+msgid " Host Name"
+msgstr "Nom d'hôte"
+
+#: jigsaw/templates/jigsaw/create.html:65 jigsaw/templates/jigsaw/game.html:82
+msgid "Public: Visible on the public games list"
+msgstr "Public : Visible sur la liste des jeux publics"
+
+#: jigsaw/templates/jigsaw/create.html:66 jigsaw/templates/jigsaw/game.html:83
+msgid "Private: Hidden from the public games list but joinable with a code"
+msgstr ""
+"Caché : Non visible sur la liste des jeux publics. On doit avoir l'ID du jeu "
+"pour joindre"
+
+#: jigsaw/templates/jigsaw/create.html:69
+#: jigsaw/templates/jigsaw/create.html:73
+#: jigsaw/templates/jigsaw/create.html:87 jigsaw/templates/jigsaw/game.html:86
+msgid "Public"
+msgstr "Public"
+
+#: jigsaw/templates/jigsaw/create.html:69
+#: jigsaw/templates/jigsaw/create.html:74
+#: jigsaw/templates/jigsaw/create.html:90 jigsaw/templates/jigsaw/game.html:86
+msgid "Private"
+msgstr "Caché"
+
+#: jigsaw/templates/jigsaw/create.html:77
+#: jigsaw/templates/jigsaw/create.html:79
+msgid "Create"
+msgstr "Commençer"
+
+#: jigsaw/templates/jigsaw/create.html:106
+#: jigsaw/templates/jigsaw/join.html:136
+msgid "Alias cannot be empty."
+msgstr "SVP entrer l'ID de jeu"
+
+#: jigsaw/templates/jigsaw/create.html:113
+msgid "Alias already in use, please choose a different one."
+msgstr "Cet ID est en cours d'utilisation."
+
+#: jigsaw/templates/jigsaw/footer.html:4
+msgid "Copyright"
+msgstr "Site Internet"
+
+#: jigsaw/templates/jigsaw/footer.html:10
+#: jigsaw/templates/jigsaw/footer.html:13
+msgid "Yes"
+msgstr "Oui"
+
+#: jigsaw/templates/jigsaw/footer.html:16
+#: jigsaw/templates/jigsaw/footer.html:19
+msgid "No"
+msgstr "Non"
+
+#: jigsaw/templates/jigsaw/footer.html:26
+#: jigsaw/templates/jigsaw/footer.html:29
+msgid "OK"
+msgstr "D'accord"
+
+#: jigsaw/templates/jigsaw/footer.html:125
+msgid "Quit game"
+msgstr "Quitter"
+
+#: jigsaw/templates/jigsaw/footer.html:126
+msgid ""
+"Are you sure you want to leave the game? You will not be able to come back "
+"to it without restarting."
+msgstr "Êtes-vous sûr de vouloir quitter? Vous ne pouvez pas retourner."
+
+#: jigsaw/templates/jigsaw/footer.html:149
+#: jigsaw/templates/jigsaw/report.html:38
+#: jigsaw/templates/jigsaw/scoreboard.html:42
+msgid "End Game"
+msgstr "Terminer jeu"
+
+#: jigsaw/templates/jigsaw/footer.html:150
+msgid ""
+"Are you sure you want to end the game? Players will be redirected to this "
+"scoreboard."
+msgstr ""
+"Êtes-vous sûr de vouloir terminer ce jeu? Il va être terminé pour tous les "
+"joueurs et ils vont venir à cette page."
+
+#: jigsaw/templates/jigsaw/footer.html:153
+msgid "Ending Game..."
+msgstr "SVP, attendez..."
+
+#: jigsaw/templates/jigsaw/footer.html:168
+msgid "Final Standings"
+msgstr "Classement final"
+
+#: jigsaw/templates/jigsaw/footer.html:169
+msgid "The game is now over. Press 'Quit' to exit."
+msgstr "Le jeu est terminé. Cliquer 'Quitter' pour quitter."
+
+#: jigsaw/templates/jigsaw/footer.html:172
+#: jigsaw/templates/jigsaw/footer.html:192
+msgid "Close Game"
+msgstr "Supprimer jeu"
+
+#: jigsaw/templates/jigsaw/footer.html:179
+msgid "Game Has Ended"
+msgstr "Le jeu est terminé"
+
+#: jigsaw/templates/jigsaw/footer.html:179
+msgid ""
+"The current game has ended. You will be redirected to the final scoreboard."
+msgstr "Le jeu est terminé. Nous vous allons apporter à page de résultats."
+
+#: jigsaw/templates/jigsaw/footer.html:193
+msgid ""
+"Are you sure you want to close the game?<br/>All scores, rankings, and other "
+"data will be lost, and the game will become inaccessible to players."
+msgstr ""
+"Êtes-vous sûr de vouloir terminer ce jeu? Toutes les informations du jeu "
+"seront perdues."
+
+#: jigsaw/templates/jigsaw/footer.html:264
+msgid "You are currently in the game:"
+msgstr "Vous êtes dans le jeu :"
+
+#: jigsaw/templates/jigsaw/footer.html:264
+msgid "Preview / Practice Game."
+msgstr "Aperçu / Jeu de pratique."
+
+#: jigsaw/templates/jigsaw/footer.html:265
+msgid ""
+"If you leave before you complete a round, your work on this round will be "
+"lost. In some cases, your entire progress may be lost."
+msgstr "Si vous quittez avant que vous completez le tour, vos progrès seront perdus."
+
+#: jigsaw/templates/jigsaw/game.html:41 jigsaw/templates/jigsaw/report.html:52
+#: jigsaw/templates/jigsaw/report.html:54
+msgid "Start"
+msgstr "Commencer"
+
+#: jigsaw/templates/jigsaw/game.html:45
+msgid "Public Game"
+msgstr "Jeu public"
+
+#: jigsaw/templates/jigsaw/game.html:46
+msgid "Private Game"
+msgstr "Jeu caché"
+
+#: jigsaw/templates/jigsaw/game.html:48
+msgid "Preview or practice"
+msgstr "Aperçu / Pratique"
+
+#: jigsaw/templates/jigsaw/game.html:49
+msgid "Preview"
+msgstr "Aperçu"
+
+#: jigsaw/templates/jigsaw/game.html:53 jigsaw/templates/jigsaw/game.html:110
+#: jigsaw/templates/jigsaw/round.html:4
+msgid "Delete"
+msgstr "Supprimer"
+
+#: jigsaw/templates/jigsaw/game.html:59
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+#: jigsaw/templates/jigsaw/game.html:62
+msgid "Game Name"
+msgstr "Nom du jeu"
+
+#: jigsaw/templates/jigsaw/game.html:65
+msgid " Game Name"
+msgstr " Nom du jeu"
+
+#: jigsaw/templates/jigsaw/game.html:67 jigsaw/templates/jigsaw/game.html:70
+#: jigsaw/templates/jigsaw/game.html:75
+msgid "Creator Name"
+msgstr "Créateur du jeu"
+
+#: jigsaw/templates/jigsaw/game.html:79
+msgid "Visibility Level"
+msgstr "Niveau de visibilité"
+
+#: jigsaw/templates/jigsaw/game.html:96
+msgid "Hover over the box below to view your edit link."
+msgstr "Passer la souris sur cette boite pour voir le lien secret du jeu."
+
+#: jigsaw/templates/jigsaw/game.html:97
+msgid "Use this link to edit or start this game from anywhere."
+msgstr ""
+"Vous pouvez l'uliser pour modifier ou commencer ce jeu de n'importe où."
+
+#: jigsaw/templates/jigsaw/game.html:98
+msgid "Keep it secret! With this link anyone can edit your game."
+msgstr ""
+"Garder ça secret! Si quelqu'un avais ce lien il peut modifier ou supprimer "
+"ton jeu!"
+
+#: jigsaw/templates/jigsaw/game.html:101
+msgid " Edit Link"
+msgstr " Lien Secret"
+
+msgid "Edit Link"
+msgstr "Lien Secret"
+
+#: jigsaw/templates/jigsaw/game.html:106 jigsaw/templates/jigsaw/join.html:79
+msgid "Rounds"
+msgstr "Tours"
+
+#: jigsaw/templates/jigsaw/game.html:111 jigsaw/templates/jigsaw/round.html:5
+msgid "Move Down"
+msgstr "Déplacer vers le bas"
+
+#: jigsaw/templates/jigsaw/game.html:112 jigsaw/templates/jigsaw/round.html:6
+msgid "Move Up"
+msgstr "Déplacer vers le haut"
+
+#: jigsaw/templates/jigsaw/game.html:113
+#: jigsaw/templates/jigsaw/print.html:328 jigsaw/templates/jigsaw/round.html:7
+msgid "Print"
+msgstr "Imprimer"
+
+#: jigsaw/templates/jigsaw/game.html:121 jigsaw/templates/jigsaw/game.html:123
+#: jigsaw/templates/jigsaw/game.html:126 jigsaw/templates/jigsaw/round.html:15
+#: jigsaw/templates/jigsaw/round.html:17
+msgid "Round Name"
+msgstr "Nom de tour"
+
+#: jigsaw/templates/jigsaw/game.html:128
+#: jigsaw/templates/jigsaw/report.html:167
+#: jigsaw/templates/jigsaw/reportpdf.html:105
+#: jigsaw/templates/jigsaw/round.html:22
+#: jigsaw/templates/jigsaw/round_end.html:81
+msgid "Perfect Round Bonus"
+msgstr "Bonus pour tour parfait"
+
+#: jigsaw/templates/jigsaw/game.html:130 jigsaw/templates/jigsaw/round.html:24
+msgid ""
+"The number of points players gain after they complete this round perfectly"
+msgstr ""
+"Combien de points les joueurs peuvent gagner si ils completent parfaitement "
+"ce tour."
+
+#: jigsaw/templates/jigsaw/game.html:154 jigsaw/templates/jigsaw/game.html:373
+#: jigsaw/templates/jigsaw/report.html:125
+#: jigsaw/templates/jigsaw/reportpdf.html:69
+#: jigsaw/templates/jigsaw/round.html:48
+#: jigsaw/templates/jigsaw/round_end.html:39
+msgid "Word"
+msgstr "Mot"
+
+#: jigsaw/templates/jigsaw/game.html:155
+#: jigsaw/templates/jigsaw/report.html:126
+#: jigsaw/templates/jigsaw/reportpdf.html:70
+#: jigsaw/templates/jigsaw/round.html:49
+#: jigsaw/templates/jigsaw/round_end.html:40
+msgid "Definition or Related Entry"
+msgstr "Définition ou Informations liées"
+
+#: jigsaw/templates/jigsaw/game.html:156 jigsaw/templates/jigsaw/play.html:189
+#: jigsaw/templates/jigsaw/report.html:82
+#: jigsaw/templates/jigsaw/report.html:127
+#: jigsaw/templates/jigsaw/reportpdf.html:23
+#: jigsaw/templates/jigsaw/reportpdf.html:71
+#: jigsaw/templates/jigsaw/round.html:50
+#: jigsaw/templates/jigsaw/round_end.html:41
+#: jigsaw/templates/jigsaw/scoreboard.html:94
+msgid "Points"
+msgstr "Points"
+
+#: jigsaw/templates/jigsaw/game.html:181 jigsaw/templates/jigsaw/round.html:76
+msgid "Add Word"
+msgstr "Ajouter mot"
+
+#: jigsaw/templates/jigsaw/game.html:187
+msgid "Add Round"
+msgstr "Ajouter tour"
+
+#: jigsaw/templates/jigsaw/game.html:190
+msgid "Someone has started the game"
+msgstr "Quelqu'un déjà commencé ce jeu."
+
+#: jigsaw/templates/jigsaw/game.html:191
+msgid "You can't edit the game after it has started."
+msgstr "Vous ne pouvez pas le modifier après qu'il est commencé."
+
+#: jigsaw/templates/jigsaw/game.html:249
+msgid "Delete Game"
+msgstr "Supprimer jeu"
+
+#: jigsaw/templates/jigsaw/game.html:250
+msgid ""
+"Are you sure you want to delete this game? This action is not reversible."
+msgstr ""
+"Êtes-vous sûr de vouloir supprimer ce jeu? Vous ne pouvez pas annuler cette "
+"action."
+
+#: jigsaw/templates/jigsaw/game.html:276
+msgid "Untitled Game"
+msgstr "Jeu sans titre"
+
+#: jigsaw/templates/jigsaw/game.html:313
+msgid "Untitled Round"
+msgstr "Tour sans titre"
+
+#: jigsaw/templates/jigsaw/game.html:361
+msgid "Delete Round"
+msgstr "Supprimer tour"
+
+#: jigsaw/templates/jigsaw/game.html:362
+msgid ""
+"Are you sure you want to delete this round? This action is not reversible."
+msgstr ""
+"Êtes-vous sûr de vouloir supprimer ce tour? Vous ne pouvez pas annuler cette "
+"action."
+
+#: jigsaw/templates/jigsaw/header.html:8
+msgid "Menu"
+msgstr "Menu"
+
+#: jigsaw/templates/jigsaw/header.html:19
+msgid "Home"
+msgstr "Accueil"
+
+#: jigsaw/templates/jigsaw/header.html:20 jigsaw/templates/jigsaw/help.html:7
+msgid "Help"
+msgstr "Manuel"
+
+#: jigsaw/templates/jigsaw/header.html:24 jigsaw/templates/jigsaw/join.html:66
+#: jigsaw/templates/jigsaw/join.html:68
+msgid "Join"
+msgstr "Joindre"
+
+#: jigsaw/templates/jigsaw/header.html:39
+#: jigsaw/templates/jigsaw/header.html:45
+msgid "New Game"
+msgstr "Nouveau jeu"
+
+#: jigsaw/templates/jigsaw/header.html:63
+msgid "Hosting: "
+msgstr "Vous êtes l'hôte du jeu: "
+
+#: jigsaw/templates/jigsaw/header.html:63
+msgid "In Game: "
+msgstr "Vous êtes dans le jeu: "
+
+#: jigsaw/templates/jigsaw/header.html:63
+#: jigsaw/templates/jigsaw/play.html:179
+#: jigsaw/templates/jigsaw/report.html:64
+#: jigsaw/templates/jigsaw/reportpdf.html:10
+#: jigsaw/templates/jigsaw/scoreboard.html:58
+#: jigsaw/templates/jigsaw/scoreboard.html:123
+msgid "Preview / Practice Game"
+msgstr "Aperçu / Jeu de pratique"
+
+#: jigsaw/templates/jigsaw/help.html:27 jigsaw/templates/jigsaw/index.html:27
+msgid "Jiggly"
+msgstr "Jiggly"
+
+#: jigsaw/templates/jigsaw/help.html:28 jigsaw/templates/jigsaw/index.html:28
+#: jigsaw/templates/jigsaw/reportpdf.html:8
+msgid "The Learning Game."
+msgstr "Le jeu éducatif."
+
+#: jigsaw/templates/jigsaw/help.html:32
+msgid "Jiggly Help"
+msgstr "Manuel de Jiggly"
+
+#: jigsaw/templates/jigsaw/help.html:34
+msgid "Coming soon"
+msgstr "Arrive bientôt"
+
+#: jigsaw/templates/jigsaw/index.html:7
+msgid "The Learning Game"
+msgstr "Le jeu éducatif"
+
+#: jigsaw/templates/jigsaw/index.html:32
+msgid "Welcome to Jiggly"
+msgstr "Bienvenue à Jiggly"
+
+#: jigsaw/templates/jigsaw/index.html:34
+msgid "Jiggly is the ultimate interactive jigsaw puzzle game!"
+msgstr "Jiggly est l'ultime jeu de casse-tète interactif!"
+
+#: jigsaw/templates/jigsaw/index.html:35
+msgid ""
+"Play to learn a new language, expand your vocabulary, or have fun with your "
+"friends!"
+msgstr ""
+"Jouer pour apprendre une nouvelle langue, élargir votre vocabulaire, où vous "
+"amuser avec vos amis!"
+
+#: jigsaw/templates/jigsaw/index.html:36
+msgid ""
+"Jiggly is free to play. No registration required, so just jump right in and "
+"create or join a game."
+msgstr ""
+"Jiggly est un site gratuit. Vous ne devez pas registrer, alors vous pouvez "
+"commencer ou joindre un jeu maintenant!"
+
+#: jigsaw/templates/jigsaw/index.html:40
+msgid "Meet The Team"
+msgstr "Qui sommes-nous?"
+
+#: jigsaw/templates/jigsaw/index.html:45
+msgid "Alex Yu"
+msgstr "Alex Yu"
+
+#: jigsaw/templates/jigsaw/index.html:46 jigsaw/templates/jigsaw/index.html:55
+msgid "Co-founder"
+msgstr "Co-fondateur"
+
+#: jigsaw/templates/jigsaw/index.html:46
+msgid "Chief Information Officer"
+msgstr "Directeur de l'information"
+
+#: jigsaw/templates/jigsaw/index.html:54
+msgid "Aish Singh"
+msgstr "Aish Singh"
+
+#: jigsaw/templates/jigsaw/index.html:55
+msgid "Director of Education and User Experience"
+msgstr "Directeur de l'éducation et l'éxperience utilisateur"
+
+#: jigsaw/templates/jigsaw/join.html:6 jigsaw/templates/jigsaw/join.html:54
+msgid "Join Game"
+msgstr "Joindre un jeu"
+
+#: jigsaw/templates/jigsaw/join.html:58
+#: jigsaw/templates/jigsaw/quick_join.html:11
+msgid "Game Alias"
+msgstr "ID du jeu"
+
+#: jigsaw/templates/jigsaw/join.html:64
+#: jigsaw/templates/jigsaw/quick_join.html:12
+msgid "Player Name"
+msgstr "Nom de joueur"
+
+#: jigsaw/templates/jigsaw/join.html:72
+msgid "Public Games"
+msgstr "Jeux publics"
+
+#: jigsaw/templates/jigsaw/join.html:76
+msgid "Alias"
+msgstr "ID"
+
+#: jigsaw/templates/jigsaw/join.html:77
+msgid "Host"
+msgstr "Hôte"
+
+#: jigsaw/templates/jigsaw/join.html:78
+#: jigsaw/templates/jigsaw/scoreboard.html:128
+msgid "Original Game"
+msgstr "Jeu original"
+
+#: jigsaw/templates/jigsaw/join.html:80
+msgid "Time Created"
+msgstr "Temps crée"
+
+#: jigsaw/templates/jigsaw/join.html:119
+#: jigsaw/templates/jigsaw/quick_join.html:29
+msgid "Invalid game alias"
+msgstr "Cet ID de jeu est invalide"
+
+#: jigsaw/templates/jigsaw/join.html:143
+msgid "No game with specified alias found."
+msgstr "Nous ne pouvons pas trouver un jeu avec cet ID."
+
+#: jigsaw/templates/jigsaw/play.html:6
+msgid "Play Round: "
+msgstr "Jouer le tour: "
+
+#: jigsaw/templates/jigsaw/play.html:180
+msgid "Playing:"
+msgstr "Vous jouez"
+
+#: jigsaw/templates/jigsaw/play.html:181 jigsaw/templates/jigsaw/play.html:183
+msgid "Submit + Score"
+msgstr "Soumettre + Marquer"
+
+#: jigsaw/templates/jigsaw/play.html:185 jigsaw/templates/jigsaw/play.html:187
+#: jigsaw/templates/jigsaw/report.html:38
+#: jigsaw/templates/jigsaw/round_end.html:4
+#: jigsaw/templates/jigsaw/round_end.html:6
+#: jigsaw/templates/jigsaw/scoreboard.html:42
+msgid "Quit"
+msgstr "Quitter"
+
+#: jigsaw/templates/jigsaw/play.html:191
+#: jigsaw/templates/jigsaw/report.html:72
+#: jigsaw/templates/jigsaw/reportpdf.html:13
+#: jigsaw/templates/jigsaw/round_end.html:28
+#: jigsaw/templates/jigsaw/scoreboard.html:130
+msgid "Created by"
+msgstr "Créé par"
+
+#: jigsaw/templates/jigsaw/play.html:192
+#: jigsaw/templates/jigsaw/report.html:73
+#: jigsaw/templates/jigsaw/reportpdf.html:14
+#: jigsaw/templates/jigsaw/round_end.html:29
+#: jigsaw/templates/jigsaw/scoreboard.html:127
+msgid "Host: "
+msgstr "Hôte: "
+
+#: jigsaw/templates/jigsaw/play.html:193
+msgid "Standard Jiggly jigsaw puzzle, size: "
+msgstr "Jeu de casse-tête normal. Taille: "
+
+#: jigsaw/templates/jigsaw/play.html:345
+msgid "Submit and Score Round"
+msgstr "Soumettre et Marquer tour"
+
+#: jigsaw/templates/jigsaw/play.html:346
+msgid ""
+"Are you sure you want to submit?<br/>The puzzle will be to the server "
+"immediately, and you will not be able to make any further changes."
+msgstr "Êtes-vous sûr de vouloir soumettre? Vous ne pouvez pas retourner."
+
+#: jigsaw/templates/jigsaw/print.html:6
+msgid "Print Round: "
+msgstr "Imprimer tour: "
+
+#: jigsaw/templates/jigsaw/print.html:331
+msgid "Print Preview"
+msgstr "Aperçu avant impression"
+
+#: jigsaw/templates/jigsaw/quick_join.html:10
+msgid " Join"
+msgstr " Joindre"
+
+#: jigsaw/templates/jigsaw/quick_join.html:14
+msgid "Go"
+msgstr "Entrer"
+
+#: jigsaw/templates/jigsaw/report.html:8
+#: jigsaw/templates/jigsaw/scoreboard.html:45
+#: jigsaw/templates/jigsaw/scoreboard.html:48
+msgid "Report"
+msgstr "Rapport"
+
+#: jigsaw/templates/jigsaw/report.html:27
+#: jigsaw/templates/jigsaw/scoreboard.html:31
+msgid "Leave"
+msgstr "Quitter"
+
+#: jigsaw/templates/jigsaw/report.html:40
+msgid "Save / Print Report (PDF)"
+msgstr "Télécharger / imprimer (PDF)"
+
+#: jigsaw/templates/jigsaw/report.html:43
+msgid "Save or Print (PDF)"
+msgstr "Télécharger ou imprimer (PDF)"
+
+#: jigsaw/templates/jigsaw/report.html:45
+msgid "Return to Scoreboard"
+msgstr "Retourner aux classements"
+
+#: jigsaw/templates/jigsaw/report.html:48
+msgid "Return to Scores"
+msgstr "Retourner aux classements"
+
+#: jigsaw/templates/jigsaw/report.html:57
+#: jigsaw/templates/jigsaw/report.html:59
+#: jigsaw/templates/jigsaw/round_end.html:9
+#: jigsaw/templates/jigsaw/round_end.html:14
+#: jigsaw/templates/jigsaw/scoreboard.html:52
+#: jigsaw/templates/jigsaw/scoreboard.html:54
+msgid "Continue"
+msgstr "Continuer"
+
+#: jigsaw/templates/jigsaw/report.html:64
+#: jigsaw/templates/jigsaw/report.html:65
+msgid "Report For: "
+msgstr "Rapport pour: "
+
+#: jigsaw/templates/jigsaw/report.html:69
+msgid "Report For Preview / Practice Game"
+msgstr "Rapport pour aperçu / jeu de pratique"
+
+#: jigsaw/templates/jigsaw/report.html:70
+msgid "Report For"
+msgstr "Rapport pour"
+
+#: jigsaw/templates/jigsaw/report.html:74
+#: jigsaw/templates/jigsaw/reportpdf.html:15
+msgid "Overall Rankings"
+msgstr "Classements"
+
+#: jigsaw/templates/jigsaw/report.html:79
+#: jigsaw/templates/jigsaw/reportpdf.html:20
+#: jigsaw/templates/jigsaw/scoreboard.html:91
+msgid "Name"
+msgstr "Nom"
+
+#: jigsaw/templates/jigsaw/report.html:85
+#: jigsaw/templates/jigsaw/reportpdf.html:26
+#: jigsaw/templates/jigsaw/scoreboard.html:97
+msgid "Round"
+msgstr "Tour"
+
+#: jigsaw/templates/jigsaw/report.html:95
+#: jigsaw/templates/jigsaw/reportpdf.html:36
+#: jigsaw/templates/jigsaw/scoreboard.html:72
+#: jigsaw/templates/jigsaw/scoreboard.html:107
+#: jigsaw/templates/jigsaw/scoreboard_update.html:8
+msgid "of"
+msgstr "de"
+
+#: jigsaw/templates/jigsaw/report.html:97
+#: jigsaw/templates/jigsaw/reportpdf.html:38
+#: jigsaw/templates/jigsaw/scoreboard.html:109
+#: jigsaw/templates/jigsaw/scoreboard_update.html:10
+msgid "Finished"
+msgstr "Fini"
+
+#: jigsaw/templates/jigsaw/report.html:103
+#: jigsaw/templates/jigsaw/reportpdf.html:44
+#: jigsaw/templates/jigsaw/scoreboard.html:115
+#: jigsaw/templates/jigsaw/scoreboard_update.html:16
+msgid "Total Players:"
+msgstr "Nombre de joueurs:"
+
+#: jigsaw/templates/jigsaw/report.html:104
+#: jigsaw/templates/jigsaw/reportpdf.html:45
+#: jigsaw/templates/jigsaw/scoreboard.html:116
+#: jigsaw/templates/jigsaw/scoreboard_update.html:17
+msgid "Max Points:"
+msgstr "Maximum de points:"
+
+#: jigsaw/templates/jigsaw/report.html:105
+#: jigsaw/templates/jigsaw/reportpdf.html:46
+#: jigsaw/templates/jigsaw/scoreboard.html:117
+#: jigsaw/templates/jigsaw/scoreboard_update.html:18
+msgid "Average Points:"
+msgstr "Moyenne:"
+
+#: jigsaw/templates/jigsaw/report.html:110
+#: jigsaw/templates/jigsaw/reportpdf.html:51
+msgid "Details"
+msgstr "Détails"
+
+#: jigsaw/templates/jigsaw/report.html:117
+#: jigsaw/templates/jigsaw/reportpdf.html:58
+msgid "Points: "
+msgstr "Points: "
+
+#: jigsaw/templates/jigsaw/report.html:118
+#: jigsaw/templates/jigsaw/reportpdf.html:59
+msgid "Total points: "
+msgstr "Points au total: "
+
+#: jigsaw/templates/jigsaw/report.html:119
+#: jigsaw/templates/jigsaw/reportpdf.html:60
+msgid "Average points this round: "
+msgstr "Moyenne ce tour: "
+
+#: jigsaw/templates/jigsaw/report.html:185
+#: jigsaw/templates/jigsaw/reportpdf.html:120
+msgid "Total this round"
+msgstr "Au total ce tour"
+
+#: jigsaw/templates/jigsaw/report.html:197
+#: jigsaw/templates/jigsaw/reportpdf.html:129
+msgid "Total to this point"
+msgstr "Au total jusqu'à ici"
+
+#: jigsaw/templates/jigsaw/reportpdf.html:10
+#: jigsaw/templates/jigsaw/reportpdf.html:11
+msgid "Report For:"
+msgstr "Rapport pour:"
+
+#: jigsaw/templates/jigsaw/reportpdf.html:18
+msgid "Rank"
+msgstr "Place"
+
+#: jigsaw/templates/jigsaw/resources.html:6
+msgid "Create or play an interactive jigsaw puzzle on Jiggly today!"
+msgstr "Créer ou jouer un jeu interactif de casse-tête sur Jiggly aujourd'hui!"
+
+#: jigsaw/templates/jigsaw/resources.html:7
+msgid ""
+"Jiggly is a free webapp for creating and sharing word-based jigsaw puzzles."
+msgstr "Jiggly est un site gratuit pour creér et partager les casse-têtes interactif."
+
+#: jigsaw/templates/jigsaw/resources.html:8
+msgid ""
+"Join us to learn a new language, expand your vocabulary, or have fun with "
+"your friends!"
+msgstr "Jouer pour apprendre une nouvelle langue, élargir votre vocabulaire, où vous amuser avec vos amis!"
+
+#: jigsaw/templates/jigsaw/resources.html:9
+msgid "Play directly -- no registration required."
+msgstr "Vous pouvez jouer directment -- vous ne devez pas registrer."
+
+#: jigsaw/templates/jigsaw/round.html:20
+msgid " Round Name"
+msgstr " Nom de tour"
+
+#: jigsaw/templates/jigsaw/round_end.html:11
+msgid "Continue to Scores"
+msgstr "Continuer aux classements"
+
+#: jigsaw/templates/jigsaw/round_end.html:16
+msgid "Finish + See Scores"
+msgstr "Finir + voir les classements"
+
+#: jigsaw/templates/jigsaw/round_end.html:23
+msgid "Score Report For"
+msgstr "Résultats pour"
+
+#: jigsaw/templates/jigsaw/round_end.html:25
+msgid "Results"
+msgstr "Résultats"
+
+#: jigsaw/templates/jigsaw/round_end.html:31
+msgid "Congratulations! You got perfect on this round!"
+msgstr "Bravo! Vous avez completé parfaitement ce tour!"
+
+#: jigsaw/templates/jigsaw/round_end.html:33
+msgid "Score This Round:"
+msgstr "Points ce tour:"
+
+#: jigsaw/templates/jigsaw/round_end.html:34
+msgid "Total Score:"
+msgstr "Points totaux:"
+
+#: jigsaw/templates/jigsaw/round_end.html:99
+msgid "Total This Round"
+msgstr "Somme ce tour:"
+
+#: jigsaw/templates/jigsaw/round_end.html:112
+msgid "Grand Total"
+msgstr "Somme totale:"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:7
+#: jigsaw/templates/jigsaw/scoreboard.html:63
+msgid "Scoreboard"
+msgstr "Classements"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:59
+msgid "Game:"
+msgstr "Jeu:"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:65
+msgid "Progress Summary For "
+msgstr "Résumé de progress pour "
+
+#: jigsaw/templates/jigsaw/scoreboard.html:67
+msgid "You're ranked No. "
+msgstr "Vous êtes classé #"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:67
+msgid ", with "
+msgstr ", avec "
+
+#: jigsaw/templates/jigsaw/scoreboard.html:67
+#, fuzzy
+#| msgid "points."
+msgid "point"
+msgstr "points."
+
+#: jigsaw/templates/jigsaw/scoreboard.html:70
+msgid "You havn't started this game yet."
+msgstr "Vous n'avez pas commencé ce jeu."
+
+#: jigsaw/templates/jigsaw/scoreboard.html:72
+msgid "You've finished "
+msgstr "Vous avez fini "
+
+#: jigsaw/templates/jigsaw/scoreboard.html:72
+#: jigsaw/templates/jigsaw/scoreboard.html:77
+msgid "round"
+msgstr "tour"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:75
+msgid "The next round is:"
+msgstr "Le prochain tour est:"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:75
+msgid "Round # "
+msgstr "Tour # "
+
+#: jigsaw/templates/jigsaw/scoreboard.html:75
+msgid "Ready? Press 'continue' (top right) to start!"
+msgstr "Êtes-vous prêt? Cliquer 'continuer' pour commencer!"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:77
+msgid "You've finished all of "
+msgstr "Vous avez completé tous les "
+
+#: jigsaw/templates/jigsaw/scoreboard.html:81
+#: jigsaw/templates/jigsaw/scoreboard.html:85
+msgid "Rankings"
+msgstr "Classements"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:84
+#: jigsaw/templates/jigsaw/scoreboard.html:125
+msgid "Alias:"
+msgstr "ID:"
+
+#: jigsaw/templates/jigsaw/scoreboard.html:84
+msgid "Use this to join the game."
+msgstr "L'utiliser pour joindre ce jeu."
+
+#: jigsaw/templates/jigsaw/scoreboard.html:121
+msgid "Game Information"
+msgstr "Informations sur le jeu"
+
+#: jigsaw/views.py:86
+msgid "My Game"
+msgstr "Mon jeu"
+
+#: jigsaw/views.py:86
+msgid "Anonymous"
+msgstr "Anonyme"
+
+#: jigsaw/views.py:87 jigsaw/views.py:328
+msgid "New Round"
+msgstr "Nouveau Tour"
+
+#: jigsaw/views.py:170
+msgid "Jiggly Game Report: "
+msgstr "Rapport de jeu Jiggly: "
+
+#: jigsaw/views.py:379
+msgid "New Word"
+msgstr "Nouveau mot"
+
+#: jigsaw/views.py:379
+msgid "Enter Definition Here"
+msgstr "Entrer votre définition ici"
+
+#~ msgid "rounds."
+#~ msgstr "tours."
+
+#~ msgid "You've finished all "
+#~ msgstr "Vous avez completé tous les "

@@ -1,0 +1,145 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{% trans 'Scoreboard' %} | Jiggly</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding-top: 5em;
+            padding-bottom: 2em;
+            border-radius: 0;
+            position: relative;
+        }
+        #site-banner .btn.pull-right{
+            margin-top:1em
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <button class="btn btn-warning pull-right" style="vertical-align:middle" id="btn-leave" title="{% trans 'Leave' %}" 
+                    onclick="{% if not round and not supervisor %}noCloseWarning=true;{% endif %}
+                        {% if supervisor %}
+                         if (ended) 
+                             delGameInstance({{ instance.pk }})
+                         else
+                             endGameInstance({{ instance.pk }})
+                        {% else %}promptQuit()
+                    {% endif %};
+                     ">
+                <span id="btn-leave-icon" class="glyphicon glyphicon-log-out"></span>
+                <span id="btn-leave-text">{% if supervisor %}{% trans "End Game" %}{% else %}{% trans "Quit" %}{% endif %}</span>
+            </button>
+            {% if supervisor %}
+            <button class="btn btn-success pull-right" style="vertical-align:middle;margin-right:10px" id="btn-leave" title="{% trans 'Report' %}"
+                    onclick="noCloseWarning=true;window.location.href = '{% url 'report' %}'">
+                <span class="glyphicon glyphicon-save-file"></span>
+                {% trans "Report" %}
+            </button>
+            {% endif %}
+            {% if round and not supervisor %}
+            <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
+                <span class="glyphicon glyphicon-play"></span>
+                {% trans "Continue" %}
+            </button>
+            {% endif %}
+            {% if instance.system == True %}
+            <h3>{% trans "Preview / Practice Game" %}</h3>{% else %}
+            <h3>{% trans "Game:" %} {{ instance.alias|safe }}</h3>{% endif %}
+        </div>
+        <div class="row">
+            {% if not supervisor %}<br />
+            <h2 id="main-heading">{% trans "Scoreboard" %}</h2>
+            <div class="jumbotron">
+                <h4>{% trans 'Progress Summary For ' %} {{ session.name|safe }}</h4>
+                <p class="cantata">
+				{% trans "You're ranked No. " %} <span id="p-rank">{{ session.rank }}</span> {% trans ", with " %} {{ session.points }} {% trans "point" %}{{ session.points|pluralize }}<br />
+                    {% if round %}
+                    {% if round.competeCount == 0 %}
+                    {% trans "You havn't started this game yet." %}
+                    {% else %}
+                    {% trans "You've finished " %}{{ round.completeCount }} {% trans "of" %} {{ game.rounds.all|length }} {% trans 'round'%}{{ game.rounds.all|pluralize }}<br />
+                    {% endif %}
+                    <span id="next-round-desc">
+                    {% trans "The next round is:" %} {{ round.name|safe }} ({% trans "Round # " %}{{ round.order }})<br />{% trans "Ready? Press 'continue' (top right) to start!" %}
+                    {% else %}
+                    {% trans "You've finished all of " %} {{ game.rounds.all|length }} {% trans 'round'%}{{ game.rounds.all|pluralize }}<br />
+                    {% endif %}
+                    </span>
+                </p>
+            </div>
+            <h3>{% trans "Rankings" %}</h3>
+            {% else %}
+            <h4>{% trans "Alias:" %} <kbd>{{ instance.alias }}</kbd></h5><h5>{% trans "Use this to join the game."%}</h4>
+            <h2 id="main-heading">{% trans "Rankings" %}</h2>
+            {% endif %}
+            <table class="table table-hover">
+                <thead>
+                <th></th>
+                <th>
+                    {% trans 'Name' %}
+                </th>
+                <th>
+                    {% trans 'Points' %}
+                </th>
+                <th>
+                    {% trans 'Round' %}
+                </th>
+                </thead>
+                <tbody id="ranking-content">
+                    {% for p in instance.players.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.points }}</td>
+                        {% if p.round %}
+                        <td>{{ p.round.order }} {% trans "of" %} {{ game.rounds.all|length }}</td>
+                        {% else %}
+                        <td>{% trans 'Finished' %}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td>{% trans 'Total Players:' %} {{ instance.players.all|length }}</td>
+                        <td>{% trans 'Max Points:' %} {{ instance.game.maxPoints }}</td>
+                        <td>{% trans 'Average Points:' %} {{ instance.averagePoints }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>{% trans "Game Information" %}</h3>
+            {% if instance.system %}
+            <h5>{% trans "Preview / Practice Game" %}</h5>
+            {% else %}
+            <h5>{% trans "Alias:" %} {{ instance.alias }}</h5>
+            {% endif %}
+            <h5>{% trans "Host: " %} {{ instance.host|safe }}</h5>
+            <h3>{% trans "Original Game" %}</h3>
+            <h5>{{ game.name|safe }}</h5>
+            <h5>{% trans "Created by" %} {{ game.creator|safe }}</h5>
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            setInterval(update, 3000);
+        })
+        function update(){
+            ajaxPost('/ajax_updatescoreboard/',{}, function(content){
+                $('#ranking-content').html(content);
+            })
+        }
+    </script>
+</body>
+</html>

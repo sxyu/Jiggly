@@ -1,0 +1,19 @@
+{% for g in games %}
+<tr class="open-game" onclick="gameClick(event)">
+    <td class="g-name">
+        {{ g.alias }}
+    </td>
+    <td class="g-host">
+        {{ g.host }}
+    </td>
+    <td>
+        {{ g.game.name }} - {{ g.game.creator }}
+    </td>
+    <td>
+        {{ g.game.rounds.all|length }}
+    </td>
+    <td>
+        {{ g.time }}
+    </td>
+</tr>
+{% endfor %}

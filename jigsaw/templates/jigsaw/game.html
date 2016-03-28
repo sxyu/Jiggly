@@ -1,0 +1,388 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{{ game.name|safe }} | Jiggly</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding-top: 5em;
+            padding-bottom: 2em;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .round-row {
+            padding: 0.5em 15px;
+            -moz-transition: background-color 1s ease;
+            -o-transition: background-color 1s ease;
+            -webkit-transition: background-color 1s ease;
+            transition: background-color 1s ease;
+            border-radius: 10px;
+            margin-bottom: 3em;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <h2 id="lb-game-name">{{ game.name }}</h2>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" id="btn-start" type="button" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-play"></span> {% trans 'Start' %}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a id="btn-start-pub">{% trans 'Public Game' %}</a></li>
+                    <li><a id="btn-start-priv">{% trans 'Private Game' %}</a></li>
+                </ul>
+                <button class="btn btn-warning" id="btn-start-prev" type="button" title="{% trans 'Preview or practice' %}">
+                    <span class="glyphicon glyphicon-eye-open"></span> {% trans 'Preview' %}
+                </button>
+			{% if not started %}
+                <button class="btn btn-danger" id="btn-delete" type="button">
+                    <span class="glyphicon glyphicon-trash"></span> {% trans 'Delete' %}
+                </button>
+			{% endif %}
+            </div><br />
+        </div>
+        <div class="row">
+            <h3>{% trans 'Overview' %}</h3>
+			{% if not started %}
+            <p>
+                {% trans "Game Name"%}<br />
+            </p>
+            <div class="input-group" id="name">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-tags" id="addon-name" title="{% trans " Game Name" %}"></span></span>
+
+                <input type="text" id="tb-name" class="form-control" maxlength=50 placeholder="{% trans "Creator Name"%}" aria-describedby="basic-addon2" value="{{ game.name }}" onkeydown="verifyValid(event)" />
+            </div><br />
+            <p>
+                {% trans "Creator Name"%}<br />
+            </p>
+            <div class="input-group" id="creator">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-user" id="addon-creator" title="{% trans " Host Name" %}"></span></span>
+
+                <input type="text" id="tb-creator" class="form-control" maxlength=100 placeholder="{% trans "Creator Name"%}" aria-describedby="basic-addon2" value="{{ game.creator }}" onkeydown="verifyValid(event)">
+            </div><br />
+            <p>
+                {% trans "Hover over the box below to view your edit link."%}<br />
+                {% trans "Use this link to edit or start this game from anywhere."%}<br />
+                {% trans "Keep it secret! With this link anyone can edit your game."%}
+            </p>
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-link" id="addon-creator" title="{% trans "Edit Link" %}"></span></span>
+                <input class="form-control auto-hide" id="disabledInput" type="text" value="{{ request.build_absolute_uri }}{{ object.get_absolute_url }}" disabled />
+            </div>
+        </div>
+        <div class="row" id="row-editor">
+            <h3>{% trans 'Rounds' %}</h3>
+            <div id="rounds-container">
+                {% for round in game.rounds.all %}
+                <div class="row round-row" id="row-rnd-{{ round.pk }}">
+                    <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-del" onclick="del_round({{ round.pk }})" title="{% trans 'Delete' %}"><span class="glyphicon glyphicon-trash link-warning"></span></button>
+                    <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-down" onclick="move_round_down({{ round.pk }})" title="{% trans 'Move Down' %}"><span class="glyphicon glyphicon-arrow-down"></span></button>
+                    <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-up" onclick="move_round_up({{ round.pk }})" title="{% trans 'Move Up' %}"><span class="glyphicon glyphicon-arrow-up"></span></button>
+                    <a href="/print/{{ game.key }}-{{ round.pk }}/" target="_blank" title="{% trans 'Print' %}">
+                        <button class="btn btn-link pull-right" style="vertical-align:middle" id="btn-rnd-{{ round.pk }}-print">
+                            <span class="glyphicon glyphicon-print"></span>
+                        </button>
+                    </a>
+                    <h4>
+                        <span style="display:inline-block; vertical-align:middle" id="lb-rnd-name-{{ round.pk }}">{{ round.name }}</span>
+                    </h4>
+                    <p>{% trans 'Round Name' %}</p>
+                    <div class="input-group" id="rnd-name">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-tags" id="addon-name" title="{% trans "Round Name" %}"></span></span>
+
+                        <input type="text" id="tb-rnd-{{ round.pk }}-name" maxlength=50 class="form-control" 
+							   oninput="update_round_name({{ round.pk }})" onkeydown="verifyValid(event)" 
+                               placeholder="{% trans "Round Name"%}" aria-describedby="basic-addon2" value="{{ round.name }}" />
+                    </div><br />
+                    <p>{% trans 'Perfect Round Bonus' %}</p>
+                    <div class="dropdown" title="
+                         {% trans "The number of points players gain after they complete this round perfectly" %}
+                         ">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-certificate"></span> <span id="lb-rnd-points-{{ round.pk }}">{{ round.points }}</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a id="btn-rnd-{{ round.pk }}-0pt" onclick="update_round_points({{ round.pk }},0)">0</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-25pt" onclick="update_round_points({{ round.pk }},25)">25</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-50pt" onclick="update_round_points({{ round.pk }},50)">50</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-75pt" onclick="update_round_points({{ round.pk }},75)">75</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-100pt" onclick="update_round_points({{ round.pk }},100)">100</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-125" onclick="update_round_points({{ round.pk }},125)">125</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-150pt" onclick="update_round_points({{ round.pk }},150)">150</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-200pt" onclick="update_round_points({{ round.pk }},200)">200</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-300pt" onclick="update_round_points({{ round.pk }},300)">300</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-600pt" onclick="update_round_points({{ round.pk }},600)">600</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-900pt" onclick="update_round_points({{ round.pk }},900)">900</a></li>
+                            <li><a id="btn-rnd-{{ round.pk }}-1200pt" onclick="update_round_points({{ round.pk }},1200)">1200</a></li>
+                        </ul>
+                    </div><br />
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Word' %}</th>
+                                <th>{% trans 'Definition or Related Entry' %}</th>
+                                <th>{% trans 'Points' %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="rnd-{{ round.pk }}-words-list">
+                            {% for word in round.words.all %}
+                            <tr id="tr-wd-{{ word.pk }}">
+                                <td>
+                                    <input type="text" id="tb-wd-{{ word.pk }}-word" maxlength=150 class="form-control" value="{{ word.word }}" onkeydown="verifyValid(event)" oninput="update_word_word({{ word.pk }})" />
+                                </td>
+                                <td>
+                                    <input type="text" id="tb-wd-{{ word.pk }}-meaning" maxlength=250 class="form-control" value="{{ word.meaning }}" onkeydown="verifyValid(event)" oninput="update_word_meaning({{ word.pk }})" />
+                                </td>
+                                <td>
+                                    <input type="number" id="tb-wd-{{ word.pk }}-points" maxlength=9 class="form-control" value="{{ word.points }}" onkeydown="verifyNumeric(event)" oninput="update_word_points({{ word.pk }})" onchange="update_word_points({{ word.pk }})" />
+                                </td>
+                                <td>
+                                    <button class="btn btn-link" id="btn-wd-{{ word.pk }}-del" onclick="del_word({{ word.pk }}, {{ round.pk }})"><span class="glyphicon glyphicon-trash link-warning"></span></button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button{% if round.words.all|length >= 31 %}
+                        style="display:none"{% endif %} class="btn btn-warning pull-right" id="btn-add-word-{{ round.pk }}" type="button" onclick="add_round_word({{ round.pk }})">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add Word' %}
+                        </button>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="btn btn-primary pull-left" style="clear:both" id="btn-add-round" type="button" onclick="add_round()">
+                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add Round' %}
+            </button>
+			{% else %}
+			<h4>{% trans "Someone has started the game" %}</h4>
+			<p>{% trans "You can't edit the game after it has started." %}</p>
+			{% endif %}	
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#tb-name').on('input', update_game_name);
+            $('#tb-creator').on('input', update_game_creator);
+            $('#btn-public').on('click', function () { update_game_public(true) });
+            $('#btn-private').on('click', function () { update_game_public(false) });
+			{% if not started %}
+            $('#btn-delete').on('click', del_game);
+			{% endif %}
+            $('#btn-start-pub').on('click', start_public_game);
+            $('#btn-start-priv').on('click', start_private_game);
+            $('#btn-start-prev').on('click', start_practice);
+        })
+        function verifyNumeric(e) {
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                (e.keyCode == 65 && e.ctrlKey === true) ||
+                (e.keyCode == 67 && e.ctrlKey === true) ||
+                (e.keyCode == 88 && e.ctrlKey === true) ||
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        }
+        function verifyValid(e) {
+            if (e.keyCode == 220) {
+                e.preventDefault();
+            }
+        }
+        function start_public_game() {
+            window.location.href = "{% url 'start' %}?public=true&game={{ game.key }}"
+        }
+        function start_private_game() {
+            window.location.href = "{% url 'start' %}?game={{ game.key }}"
+        }
+
+        function start_practice() {
+            var instname = randomName();
+            var gameid = "{{ game.pk }}";
+            var alias = instname;
+            var pub = false, time = 1800, name = "{{ game.creator }}";
+            ajaxPost('/ajax_createinstance/', { 'id': gameid, 'alias': alias, 'host': name, 'public': pub, 'totaltime': time, 'system': 'true' }, function (content) {
+                setPermCookie('instanceid', content);
+                setTimeout(function () {
+                    ajaxPost('/ajax_startsession/', { 'id': content, 'name': name }, function (content) {
+                        setPermCookie('psessionid', content);
+                        window.location.href = "{% url 'play' %}"
+                    });
+                }, 200);
+            });
+        }
+		{% if not started %}
+        function del_game() {
+            diag(
+                "{% trans 'Delete Game' %}",
+                "{% trans 'Are you sure you want to delete this game? This action is not reversible.' %}",
+                 function () {
+                     ajaxPost('/ajax_gamedel/', { 'id': "{{ game.key }}", }, function () {
+                         rcg = getCookie('recentgames').replace(/['"]+/g, '')
+                         rcg = rcg.split('\\');
+                         setPermCookie('gameid', rcg[0]);
+                         nrcg = []
+                         for (var i = 1; i < rcg.length; i++) {
+                             if (rcg[i].trim())
+                                 nrcg.push(rcg[i].trim());
+                         }
+                         setPermCookie('recentgames', '"' + nrcg.join("\\\\") + '"');
+                         window.location.href = "/game/" + rcg[0];
+                     });
+                 }
+            );
+        }
+		{% endif %}
+        var ugn_to, ugc_to, g_to;
+        function autoTo(timer, callback, time) {
+            if (timer) clearTimeout(timer);
+            if (!time) time = 600;
+            timer = setTimeout(callback, time);
+        }
+        function _update_game_name() {
+            newname = $('#tb-name').val().trim();
+            if (!newname) newname = "{% trans 'Untitled Game' %}";
+            ajaxPost('/ajax_gamemod_name/', { 'id': "{{ game.key }}", 'content': newname }, function () {
+                $('#lb-game-name').text(newname);
+                $('#dp-lb-cur-game-name').text(newname);
+                $('#navbar-lb-game-name').text(newname);
+            });
+        }
+        function update_game_name() {
+            autoTo(ugn_to, _update_game_name);
+        }
+        function _update_game_creator() {
+            ajaxPost('/ajax_gamemod_creator/', { 'id': "{{ game.key }}", 'content': $('#tb-creator').val() }, function () {
+            });
+        }
+        function update_game_creator() {
+            autoTo(ugc_to, _update_game_creator);
+        }
+        function update_game_public(content) {
+            ajaxPost('/ajax_gamemod_public/', { 'id': "{{ game.key }}", 'content': content }, function () {
+                if (content) {
+                    $('#lb-public').text("Public")
+                }
+                else {
+                    $('#lb-public').text("Private")
+                }
+            });
+        }
+        function add_round(id) {
+            autoTo(g_to, function () {
+                ajaxPost('/ajax_gamemod_roundadd/', { 'id': "{{ game.key }}" }, function (content) {
+                    newname = $('#rounds-container').append(content);
+                });
+            }, 200);
+        }
+        function update_round_name(id) {
+            autoTo(g_to, function () {
+                newname = $('#tb-rnd-' + id + '-name').val().trim();
+                if (!newname) newname = "{% trans 'Untitled Round' %}";
+                ajaxPost('/ajax_roundmod_name/', { 'key': "{{ game.key }}", 'id': id, 'content': newname }, function (content) {
+                    $('#lb-rnd-name-' + id).text(newname);
+                });
+            });
+        }
+        function add_round_word(id) {
+            autoTo(g_to, function () {
+                ajaxPost('/ajax_roundmod_wordadd/', { 'key': "{{ game.key }}", 'id': id }, function (content) {
+                    newname = $('#rnd-' + id + '-words-list').append(content);
+                });
+            },200);
+        }
+        function update_round_points(id, points) {
+            autoTo(g_to, function () {
+                ajaxPost('/ajax_roundmod_points/', { 'key': "{{ game.key }}", 'id': id, 'content': points }, function () {
+                    $('#lb-rnd-points-' + id).text(points);
+                });
+            },200);
+        }
+        function move_round_up(id) {
+            autoTo(g_to, function () {
+                ajaxPost('/ajax_roundmove/', { 'key': "{{ game.key }}", 'id': id }, function (content) {
+                    if (content == "OK") {
+                        $("#row-rnd-" + id).insertBefore($("#row-rnd-" + id).prev());
+                        $("#row-rnd-" + id).css('background-color', "#fd7")
+                        setTimeout(function () {
+                            $("#row-rnd-" + id).css('background-color', "#fff")
+                        }, 1000);
+                    }
+                });
+            },200);
+        }
+        function move_round_down(id) {
+            autoTo(g_to, function () {
+                ajaxPost('/ajax_roundmove/', { 'key': "{{ game.key }}", 'id': id, 'down': true }, function (content) {
+                    if (content == "OK") {
+                        $("#row-rnd-" + id).insertAfter($("#row-rnd-" + id).next());
+                        $("#row-rnd-" + id).css('background-color', "#fd7")
+                        setTimeout(function () {
+                            $("#row-rnd-" + id).css('background-color', "#fff")
+                        }, 600);
+                    }
+                });
+            },200);
+        }
+        function del_round(id) {
+            diag(
+                "{% trans 'Delete Round' %}",
+                "{% trans 'Are you sure you want to delete this round? This action is not reversible.' %}",
+                 function () {
+                     ajaxPost('/ajax_rounddel/', { 'key': "{{ game.key }}", 'id': id }, function () {
+                         $('#row-rnd-' + id).remove();
+                     });
+                 }
+            );
+        }
+        function update_word_word(id) {
+            autoTo(g_to, function () {
+                newname = $('#tb-wd-' + id + '-word').val().trim();
+                if (!newname) newname = "{% trans 'Word' %}";
+                ajaxPost('/ajax_wordmod/', { 'key': "{{ game.key }}", 'id': id, 'word': newname }, function () {
+                });
+            });
+        }
+        function update_word_meaning(id) {
+            autoTo(g_to, function () {
+                newname = $('#tb-wd-' + id + '-meaning').val().trim();
+                ajaxPost('/ajax_wordmod/', { 'key': "{{ game.key }}", 'id': id, 'meaning': newname }, function () {
+                });
+            });
+        }
+        function update_word_points(id) {
+            autoTo(g_to, function () {
+                newname = $('#tb-wd-' + id + '-points').val().trim();
+                ajaxPost('/ajax_wordmod/', { 'key': "{{ game.key }}", 'id': id, 'points': newname }, function () {
+                });
+            });
+        }
+        function del_word(id, rid) {
+            autoTo(g_to, function () {
+                ajaxPost('/ajax_worddel/', { 'key': "{{ game.key }}", 'id': id }, function () {
+                    $('#tr-wd-' + id).remove();
+                    $('#btn-add-word-' + rid).css('display', 'inline')
+                });
+            }, 200);
+        }
+    </script>
+</body>
+</html>

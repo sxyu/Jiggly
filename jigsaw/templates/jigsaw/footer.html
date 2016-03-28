@@ -1,0 +1,278 @@
+{% load staticfiles %}
+{% load i18n %}
+<div id="site-footer">
+    <span>{% trans "Copyright" %} <span class="sans-serif">&copy;</span> Jiggly 2016</span>
+</div>
+<div id="diag-confirm" style="display:none; text-align:center">
+    <h3 id="cf-title"></h3>
+    <p id="cf-content"></p>
+    <button class="btn btn-danger" 
+            style="margin-right:10px; vertical-align:middle" id="btn-yes" title="{% trans 'Yes' %}"
+            onclick="ret=true;javascript:parent.$.fancybox.close()">
+        <span class="glyphicon glyphicon-ok"></span>
+        {% trans "Yes" %}
+    </button>
+    <button class="btn btn-primary" 
+            style="margin-right:10px; vertical-align:middle" id="btn-yes" title="{% trans 'No' %}"
+            onclick="javascript:parent.$.fancybox.close()">
+        <span class="glyphicon glyphicon-remove"></span>
+        {% trans "No" %}
+    </button>
+</div>
+<div id="diag-msg" style="display:none; text-align:center">
+    <h3 id="msg-title"></h3>
+    <p id="msg-content"></p>
+    <button class="btn btn-danger" 
+            style="margin-right:10px; vertical-align:middle" id="btn-yes" title="{% trans 'OK' %}"
+            onclick="javascript:parent.$.fancybox.close()">
+        <span class="glyphicon glyphicon-ok"></span>
+        {% trans "OK" %}
+    </button>
+</div>
+<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'fancybox/jquery.fancybox.pack.js' %}"></script>
+<script type="text/javascript" src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
+<script type="text/javascript">
+    var curgame = -1;
+    var cursession = -1;
+    var curinstance = -1;
+    function setCookie(name, value, days) {
+        var expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        else {
+            expires = "";
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+    function setPermCookie(name, value) {
+        setCookie(name, value, 99999)
+    }
+    function getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) {
+                    c_end = document.cookie.length;
+                }
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+        }
+        return "";
+    }
+    function randomName(length) {
+        var result = '';
+        if (!length) length = 32
+        var numlower = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (var i = length; i > 0; --i) result += numlower[Math.floor(Math.random() * numlower.length)];
+        return result;
+    }
+    var ret;
+    function diag(title, msg, callback) {
+        ret = false;
+        $('#cf-title').text(title);
+        $('#cf-content').html(msg);
+        $.fancybox({
+            'modal':true,
+            'autoScale':true,
+            'transitionIn':'elastic',
+            'transitionOut':'elastic',
+            'speedIn':500,
+            'speedOut':300,
+            'autoDimensions':true,
+            'fitToView':true,
+            'centerOnScroll':true,
+            'href':"#diag-confirm",
+            afterClose: function(){
+                if (ret)
+                    callback()
+            }
+        });
+    }
+    function msg(title, msg, callback) {
+        $('#msg-title').text(title);
+        $('#msg-content').html(msg);
+        $.fancybox({
+            'modal':true,
+            'autoScale':true,
+            'transitionIn':'elastic',
+            'transitionOut':'elastic',
+            'speedIn':500,
+            'speedOut':300,
+            'autoDimensions':true,
+            'fitToView':true,
+            'centerOnScroll':true,
+            'href':"#diag-msg",
+            afterClose: function(){
+                callback();
+            }
+        });
+    }
+    function promptQuit(){
+        diag(
+            "{% trans 'Quit game' %}",
+            "{% trans 'Are you sure you want to leave the game? You will not be able to come back to it without restarting.' %}",
+            function(){
+                noCloseWarning = true; 
+                window.location.href = "/?clear=true";
+            }
+        )
+    }
+    function createGameInstance(gameid, alias, host, pub, time, earlycallback, pname, callback) {
+        ajaxPost('/ajax_createinstance/', { 'id': gameid, 'alias':alias, 'host': host, 'public': pub, 'totaltime': time }, function (content) {
+            setPermCookie('instanceid', content);
+            earlycallback();
+            if (pname) {
+                setTimeout(function () {
+                    startSession(content, pname, true, callback);
+                }, 200);
+            }
+        });
+    }
+    {% if supervisor %}
+    var ending=false;
+    function endGameInstance(){
+        if (ending) return;
+        diag(
+            "{% trans 'End Game' %}",
+            "{% trans 'Are you sure you want to end the game? Players will be redirected to this scoreboard.' %}",
+            function(){
+                ending = true;
+                $('#btn-leave-text').text("{% trans 'Ending Game...' %}");
+                ajaxPost('/ajax_endinstance/', { 'id': curinstance }, function (content) {
+                });
+            }
+        );
+    }
+    {% endif %}
+    var checktmr;
+    var ended=false;
+    function checkGameEnded(){
+        ajaxGet('/ajax_checkgameended/', { 'id': curinstance }, function (content) {
+            if (content=="1" || content=="2"){
+                clearInterval(checktmr);
+                ended = true;
+                {% if scoreboard %}
+                $('#main-heading').text("{% trans 'Final Standings' %}");
+                $('#next-round-desc').text("{% trans "The game is now over. Press 'Quit' to exit." %}");
+                $('#btn-next').hide();
+                {% if supervisor %}
+                $('#btn-leave-text').text("{% trans 'Close Game' %}");
+                $('#btn-leave').addClass('btn-danger');
+                $('#btn-leave').removeClass('btn-warning');
+                $('#btn-leave-icon').removeClass('glyphicon-log-out');
+                $('#btn-leave-icon').addClass('glyphicon-remove');
+                {% endif %}
+                {% else %}
+                msg("{% trans 'Game Has Ended' %}","{% trans 'The current game has ended. You will be redirected to the final scoreboard.'%}",
+                    function(){
+                        noCloseWarning = true;
+						if (content == "2")
+							window.location.href ="{% url 'index' %}?clear=true";
+						else
+							window.location.href ="{% url 'scoreboard' %}";
+                    }
+                )
+                {% endif %}
+            }
+        });
+    }
+    {% if supervisor %}
+    function delGameInstance(){
+        diag(
+            "{% trans 'Close Game' %}",
+            "{% trans 'Are you sure you want to close the game?<br/>All scores, rankings, and other data will be lost, and the game will become inaccessible to players.' %}",
+             function(){
+                ajaxPost('/ajax_delinstance/', { 'id': curinstance }, function (content) {
+                    setPermCookie('instancemankey', '');
+                    setPermCookie('psessionid', '');
+                        noCloseWarning = true; 
+                        window.location.href = "/?clear=true";
+                });
+            }
+        );
+    }
+    {% endif %}
+    function startSession(alias, name, id, callback) {
+        if (id) {
+            ajaxPost('/ajax_startsession/', { 'id': alias, 'name': name }, function (content) {
+                setPermCookie('psessionid', content);
+                callback();
+            });
+        }
+        else {
+            ajaxPost('/ajax_startsession/', { 'alias': alias, 'name': name }, function (content) {
+                setPermCookie('psessionid', content);
+                callback();
+            });
+        }
+    }
+    var timer;
+    var touchduration = 350;
+    function touchhandler(e) {
+        if (e.type == "touchstart") {
+            timer = setTimeout(function () { onlongtouch(e) }, touchduration);
+        }
+        else {
+            clearTimeout(timer);
+        }
+		if (e.changedTouches.length > 1) return;
+		var t=e.changedTouches[0];
+        if ($(t.target).hasClass('draggable')) {
+			var sim=document.createEvent("MouseEvent");
+			sim.initMouseEvent({
+					touchstart: "mousedown",
+					touchmove: "mousemove",
+					touchend: "mouseup"
+			}[e.type], true,  true, window, 1, 
+					t.screenX, t.screenY, t.clientX, t.clientY, false, 
+					false, false, false, 0, null
+			);
+			t.target.dispatchEvent(sim);
+			e.preventDefault();
+		}
+    }
+    function onlongtouch(e) {
+		if (e.changedTouches.length > 1) return;
+        var t = e.changedTouches[0];
+        if ($(t.target).hasClass('draggable')) {
+			var sim=document.createEvent("MouseEvent");
+			sim.initMouseEvent(
+					"mouseup", true,  true, window, 1, 
+					t.screenX, t.screenY, t.clientX, t.clientY, false, 
+					false, false, false, 2, null
+			);
+			t.target.dispatchEvent(sim);
+			e.preventDefault();
+		}
+    }
+    var noCloseWarning = false;
+    $(document).ready(function () {
+        $(".popup").fancybox();
+        curgame = getCookie("gameid")
+        cursession = getCookie("psessionid")
+        curinstance = getCookie("instanceid")
+        document.addEventListener("touchstart", touchhandler, true);
+        document.addEventListener("touchmove", touchhandler, true);
+        document.addEventListener("touchend", touchhandler, true);
+        document.addEventListener("touchcancel", touchhandler, true);
+        {% if in_game %}
+        window.addEventListener("beforeunload", function (e) {
+            if (!noCloseWarning){
+                var confirmationMessage = '{% trans "You are currently in the game:" %} {% if instance.system %}{% trans "Preview / Practice Game." %}{% else %}{{ instance.alias }}{% endif %}. '
+                                        + '{% trans "If you leave before you complete a round, your work on this round will be lost. In some cases, your entire progress may be lost." %}';
+
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            }
+        });
+        checktmr = setInterval(checkGameEnded, 5000);
+        checkGameEnded()
+        {% endif %}
+    });
+</script>

@@ -1,0 +1,122 @@
+{% load i18n %}
+{% load staticfiles %}
+<div class="jumbotron" id="site-banner">
+    <button class="btn btn-warning pull-right" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="window.location.href = '/?clear=true'">
+        <span class="glyphicon glyphicon-log-out"></span>
+        {% trans "Quit" %}
+    </button>
+    {% if round.next %}
+    <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
+        <span class="glyphicon glyphicon-play"></span>
+        {% trans "Continue to Scores" %}
+    </button>
+    {% else %}
+    <button class="btn btn-success pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
+        <span class="glyphicon glyphicon-play"></span>
+        {% trans "Finish + See Scores" %}
+    </button>
+    {% endif %}
+    <h2 id="lb-game-name">{{ game.name }}</h2>
+</div>
+<div id="screen-header">
+    {% if session %}
+    <h3>{% trans "Score Report For" %} {{ session.name|safe }}</h3>
+    {% else %}
+    <h3>{% trans "Results" %}</h3>
+    {% endif %}
+    <h4>{{ round.name|safe }} - {{ game.name|safe }}</h4>
+    <h5>{% trans "Created by" %} {{ game.creator|safe }}</h5>
+    <h5>{% trans "Host: " %} {{ instance.host|safe }}</h5>
+    {% if round_bonus %}
+    <p>{% trans 'Congratulations! You got perfect on this round!' %}{% if round.points > 0 %} +{{ round.points }}{% endif %}</p>
+    {% endif %}
+    <p>{% trans "Score This Round:" %} {{ score }} / {{ max_score }}</p>
+    {% if session %}<h4>{% trans "Total Score:" %} {{ session.points }}</h4>{% endif %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{% trans 'Word' %}</th>
+                <th>{% trans 'Definition or Related Entry' %}</th>
+                <th>{% trans 'Points' %}</th>
+            </tr>
+        </thead>
+        <tbody id="rnd-{{ round.pk }}-words-list">
+            {% for w in words %}
+            <tr{% if w.1 == 1 %} class="correct" {% endif %}>
+        <td>
+            {% if w.1 == 1 %}
+            <span class="glyphicon glyphicon-ok" style="color:darkseagreen"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-remove" style="color:indianred"></span>
+            {% endif %}
+        </td>
+        <td>
+            {{ w.0.word }}
+        <td>
+            {{ w.0.meaning }}
+        </td>
+        <td>
+            {% if w.1 == 1 %}
+            {{ w.0.points }}
+            {% else %}
+            0
+            {% endif %}
+            / {{ w.0.points }}
+        </td>
+        </tr>
+        {% endfor %}
+        {% if round.points > 0 %}
+        <tr {% if round_bonus %}
+            class="correct"
+            {% endif %}>
+            <td>
+                {% if round_bonus %}
+                <span class="glyphicon glyphicon-certificate" style="color:darkseagreen"></span>
+                {% else %}
+                <span class="glyphicon glyphicon-remove" style="color:indianred"></span>
+                {% endif %}
+            </td>
+            <td>
+                {% trans "Perfect Round Bonus" %}
+            </td>
+            <td></td>
+            <td>
+                {% if round_bonus %}
+                {{ round.points }}
+                {% else %}
+                0
+                {% endif %}
+                / {{ round.points }}
+            </td>
+        </tr>
+        {% endif %}
+        <tr class="awards">
+            <td>
+                <span class="glyphicon glyphicon-stats" style="color:orange"></span>
+            </td>
+            <td>
+                {% trans "Total This Round" %}
+            </td>
+            <td></td>
+            <td>
+                {{ score }} / {{ max_score }}
+            </td>
+        </tr>
+        {% if session %}
+        <tr class="awards">
+            <td>
+                <span class="glyphicon glyphicon-stats" style="color:darkseagreen"></span>
+            </td>
+            <td>
+                {% trans "Grand Total" %}
+            </td>
+            <td></td>
+            <td>
+                {{ session.points }} / {{ game.maxPoints }}
+            </td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>

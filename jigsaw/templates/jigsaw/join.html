@@ -1,0 +1,161 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+    <title>{% trans 'Join Game' %} | Jiggly</title>
+    <style type="text/css">
+        #site-body div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding: 15em 0 11em;
+            border-radius: 0;
+            text-align: center;
+            position: relative;
+        }
+
+        #site-body .input-group, #site-body .dropdown {
+            width: 50%;
+            min-width: 250px;
+            margin: auto;
+            margin-bottom: 3px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #site-body .dropdown-menu {
+            width: 200px;
+            left: 50%;
+            margin-left: -100px;
+            text-align: center;
+        }
+
+        .round-row {
+            padding: 0.5em 15px;
+            -moz-transition: background-color 1s ease;
+            -o-transition: background-color 1s ease;
+            -webkit-transition: background-color 1s ease;
+            transition: background-color 1s ease;
+            border-radius: 10px;
+            margin-bottom: 3em;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div class="container" id="site-body">
+        <div class="jumbotron" id="site-banner">
+            <h2 id="lb-game-name">{% trans 'Join Game' %}</h2><br />
+            <div class="input-group" id="alias">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-tags" id="addon-alias" title="{% trans " Game Alias" %}"></span></span>
+
+                <input type="text" id="tb-alias" class="form-control" maxlength=100 placeholder="{% trans "Game Alias"%}" aria-describedby="basic-addon2" value="{{ base.name }}">
+            </div>
+            <label style="color:#ffaaaa" id="lb-warning"></label><br />
+            <div class="input-group" id="name">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-user" id="addon-host" title="{% trans " Host Name" %}"></span></span>
+
+                <input type="text" id="tb-name" class="form-control" maxlength=100 placeholder="{% trans "Player Name"%}" aria-describedby="basic-addon2" value="{{ base.creator }}">
+            </div><br />
+            <button class="btn btn-danger" style="vertical-align:middle" id="btn-join" title="{% trans 'Join' %}">
+                <span class="glyphicon glyphicon-log-in"></span>
+                {% trans "Join" %}
+            </button>
+        </div>
+        <div class="row" id="games-list">
+            <h3>{% trans "Public Games" %}</h3>
+			<div class="table-responsive">
+				<table class="table table-hover" id="game-list">
+					<thead>
+						<tr>
+							<th>{% trans 'Alias' %}</th>
+							<th>{% trans 'Host' %}</th>
+							<th>{% trans 'Original Game' %}</th>
+							<th>{% trans 'Rounds' %}</th>
+							<th>{% trans 'Time Created' %}</th>
+						</tr>
+					</thead>
+					<tbody id="games-list-content">
+						{% for g in games %}
+						<tr class="open-game" onclick="gameClick(event)">
+							<td class="g-name">
+								{{ g.alias }}
+							</td>
+							<td class="g-host">
+								{{ g.host }}
+							</td>
+							<td>
+								{{ g.game.name }} - {{ g.game.creator }}
+							</td>
+							<td>
+								{{ g.game.rounds.all|length }}
+							</td>
+							<td>
+								{{ g.time }}
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+        </div>
+    </div>
+    {% include 'jigsaw/footer.html' %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btn-join').click(function () {
+                var alias = $('#tb-alias').val();
+                var name = $('#tb-name').val();
+                ajaxPost('/ajax_startsession/', { 'alias': alias, 'name': name }, function (content) {
+                    if (content) {
+                        setPermCookie('psessionid', content);
+                        window.location.href = "{% url 'scoreboard' %}";
+                    }
+                    else {
+                        $('#lb-warning').text("{% trans 'Invalid game alias' %}");
+                    }
+                });
+            });
+            $('#tb-alias').on('input', function () {
+                checkAlias();
+            });
+            setInterval(update, 5000);
+        });
+        function gameClick(e) {
+            $('#tb-alias').val($(e.target).parent().children('.g-name').text().trim());
+            window.scrollTo(0, 0);
+            $('#tb-name').focus()
+            checkAlias();
+        }
+        function checkAlias() {
+            if ($('#tb-alias').val().trim() == "") {
+                $('#lb-warning').text("{% trans 'Alias cannot be empty.' %}");
+                $('#btn-create').hide();
+                return; 0
+            }
+            ajaxGet('/ajax_aliasexists/', { 'alias': $('#tb-alias').val() }, function (content) {
+                if (content == 0) {
+                    $('#btn-create').hide();
+                    $('#lb-warning').text("{% trans 'No game with specified alias found.' %}");
+                }
+                else {
+                    $('#btn-create').show();
+                    $('#lb-warning').text("");
+                }
+            });
+        }
+        function update() {
+            ajaxPost('/ajax_updatejoin/',{}, function(content){
+                $('#games-list-content').html(content);
+            })
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<tr id="tr-wd-{{ word.pk }}">
+    <td>
+        <input type="text" id="tb-wd-{{ word.pk }}-word" maxlength=150 class="form-control" value="{{ word.word }}" oninput="update_word_word({{ word.pk }})" />
+    </td>
+    <td>
+        <input type="text" id="tb-wd-{{ word.pk }}-meaning" maxlength=250 class="form-control" value="{{ word.meaning }}" oninput="update_word_meaning({{ word.pk }})" />
+    </td>
+    <td>
+        <input type="number" id="tb-wd-{{ word.pk }}-points" maxlength=9 class="form-control" value="{{ word.points }}" onkeydown="verifyNumeric()" oninput="update_word_points({{ word.pk }})" onchange="update_word_points({{ word.pk }})" />
+    </td>
+    <td>
+        <button class="btn btn-link" id="btn-wd-{{ word.pk }}-del" onclick="del_word({{ word.pk }}, {{ round.pk }})"><span class="glyphicon glyphicon-trash link-warning"></span></button>
+    </td>
+</tr>
+{% if round.words.all|length >= 31 %}
+<script>
+    $(document).ready(function () {
+        $('#btn-add-word-{{ round.pk }}').css('display', 'none')
+    })
+</script>
+{% endif %}

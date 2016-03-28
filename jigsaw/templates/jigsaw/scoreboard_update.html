@@ -1,0 +1,19 @@
+{% load i18n %}
+{% for p in instance.players.all %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ p.name }}</td>
+    <td>{{ p.points }}</td>
+    {% if p.round %}
+    <td>{{ p.round.order }} {% trans "of" %} {{ game.rounds.all|length }}</td>
+    {% else %}
+    <td>{% trans 'Finished' %}</td>
+    {% endif %}
+</tr>
+{% endfor %}
+<tr>
+    <td></td>
+    <td>{% trans 'Total Players:' %} {{ instance.players.all|length }}</td>
+    <td>{% trans 'Max Points:' %} {{ instance.game.maxPoints }}</td>
+    <td>{% trans 'Average Points:' %} {{ instance.averagePoints }}</td>
+</tr>
