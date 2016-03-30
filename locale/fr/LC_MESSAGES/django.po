@@ -885,3 +885,6 @@ msgstr "Type du tour"
 
 msgid "The type of the round."
 msgstr "Le type du tour."
+
+msgid "Your Game Board"
+msgstr "Votre plateau de jeu"
