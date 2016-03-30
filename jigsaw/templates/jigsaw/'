@@ -1,0 +1,175 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+	<title>{% trans 'Matching Round: '%}{{ round.name|safe }} - {{ game.name|safe }} | Jiggly</title>
+    <style type="text/css">
+        div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding: 5em 5em 2em 5em;
+            margin-top:-3em;
+            border-radius: 0;
+            position: relative;
+        }
+        body{
+            background-color:#3a3a3a;
+        }
+        #primary-nav {
+            z-index:10000000000;
+        }
+        #site-footer {
+            width:100%;
+            min-width:1200px;
+        }
+        #document-body{
+            padding-top:6em;
+        }
+        .page {
+            margin: 0;
+            position:relative;
+            page-break-after:always;
+            margin-top:3em;
+            padding:0.5in;
+            height:100%;
+            min-height:500px;
+            background: url("{% static 'images/spring_bokeh.jpg' %}") no-repeat center center;
+            background-size:cover;
+            width:100%;
+            min-width:1200px;
+        }
+        ul#left-list, ul#right-list{
+			color:#fff;
+			list-style:none;
+			padding:0;
+			margin:0;
+			display:inline-block;
+		}
+        div#screen-header {
+            padding: 0 5em;
+            color: #fff;
+        }
+
+
+        /* score screen styles */
+        div#screen-header table{
+            color: #fff;
+        }
+        div#screen-header table tr:hover{
+            background: #4d4d4d;
+        }
+        tr.correct{
+            background-color:#445544
+        }
+        div#screen-header table tr.correct:hover{
+            background-color:#516151
+        }
+        tr.awards{
+            background-color:#333
+        }
+        div#screen-header table tr.awards:hover{
+            background-color:#444
+        }
+        tr span.glyphicon{
+            display:inline-block;
+            height:100%;
+            line-height:22px;
+            vertical-align:middle;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div id="document-body">
+        <div id="screen-header">
+            {% if instance.system == True %}
+			<h4>{% trans 'Preview / Practice Game' %}</h4>{% else %}
+            <h4>{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
+            <button class="btn btn-primary" style="margin-right:10px; vertical-align:middle" id="btn-grade" title="{% trans 'Submit + Score' %}">
+                <span class="glyphicon glyphicon-edit"></span>
+                {% trans "Submit + Score" %}
+            </button>
+            <button class="btn btn-warning" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="promptQuit()">
+                <span class="glyphicon glyphicon-log-out"></span>
+                {% trans "Quit" %}
+            </button>
+            <h3>{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
+			<h4>{% trans 'Type: ' %} <span id="lb-size"></span> {{ type|title }} {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
+			<h5>{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
+        </div>
+    </div>
+	<div class="page">
+		<ul id="left-list">
+			<li>Voiture</li>
+			<li>Voiture</li>
+			<li>Voiture</li>
+		</ul>
+		<ul id="right-list">
+			<li>Car</li>
+			<li>Car</li>
+			<li>Car</li>
+		</ul>
+	</div>
+    {% include 'jigsaw/footer.html' %}
+    <script type="text/javascript">
+        var drag='';
+        var pl, pt, il, it;
+        var curtop = 1;
+        function itemMouseDown(e){
+            drag = e.target.id;
+            e.preventDefault();
+        }
+        function itemMouseMove(e){
+            if (drag){
+                var dragged = $('#' + drag);
+                var y = dragged.offset().top+e.pageY-pt;
+                var x = dragged.offset().left+e.pageX-pl;
+            }
+        }
+        function itemMouseUp(e){
+            if (drag){
+                var dragged = $('#' + drag);
+            }
+            drag = '';
+            e.preventDefault();
+        }
+		function layoutWords(words){
+			
+		}
+        $(document).ready(function () {
+			$('body').css('zoom', '100%');
+            body = document.getElementById('document-body');
+            $('#btn-grade').click(grade);
+            window.addEventListener("keydown",function (e) {
+                if ((e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) && !graded) {
+                    e.preventDefault();
+                }
+            })
+            ajaxGet('/ajax_getwords/', {'id':{{ round.pk }}}, function(content){
+                var words=[];
+                var spl = content.split('\n');
+                for (var i = 0; i < spl.length; i+=3) {
+                    if (spl[i])
+                        words.push([spl[i], spl[i + 1], spl[i + 2]]);
+                }
+                layoutWords(words);
+                words = null
+                $('.item').each(function(){
+                    $(this).mousedown(itemMouseDown);
+                    $(this).mousemove(itemMouseMove);
+                    $(this).mouseup(itemMouseUp);
+                    $(this).contextmenu(function(){ return false });
+                })
+                $(document).mouseup(itemMouseUp);
+            });
+        })
+    </script>
+</body>
+</html>

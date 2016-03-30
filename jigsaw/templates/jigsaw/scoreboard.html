@@ -100,7 +100,7 @@
                 <tbody id="ranking-content">
                     {% for p in instance.players.all %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.rank }}</td>
                         <td>{{ p.name }}</td>
                         <td>{{ p.points }}</td>
                         {% if p.round %}
@@ -133,7 +133,11 @@
     {% include 'jigsaw/footer.html' %}
     <script type="text/javascript">
         $(document).ready(function(){
-            setInterval(update, 3000);
+			{% if supervisor %}
+				setInterval(update, 1500);
+			{% else %}
+				setInterval(update, 5000);
+			{% endif %}
         })
         function update(){
             ajaxPost('/ajax_updatescoreboard/',{}, function(content){

@@ -29,7 +29,7 @@
                 <tbody>
                     {% for p in instance.players.all %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.rank }}</td>
                         <td align="left">{{ p.name }}</td>
                         <td align="left">{{ p.points }}</td>
                         {% if p.round %}

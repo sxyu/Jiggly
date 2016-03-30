@@ -4,7 +4,7 @@
 <html>
 <head>
     {% include 'jigsaw/resources.html' %}
-    <title>{% trans 'Play Round: ' %}{{ round.name|safe }} - {{ game.name|safe }} | Jiggly</title>
+	<title>{% trans 'Jigsaw Round: '%}{{ round.name|safe }} - {{ game.name|safe }} | Jiggly</title>
     <style type="text/css">
         div#site-banner {
             background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
@@ -175,7 +175,7 @@
     <div id="document-body">
         <div id="screen-header">
             {% if instance.system == True %}
-            <h4>{% trans 'Preview / Practice Game' %}</h4>{% else %}
+			<h4>{% trans 'Preview / Practice Game' %}</h4>{% else %}
             <h4>{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
             <button class="btn btn-primary" style="margin-right:10px; vertical-align:middle" id="btn-grade" title="{% trans 'Submit + Score' %}">
                 <span class="glyphicon glyphicon-edit"></span>
@@ -185,13 +185,13 @@
                 <span class="glyphicon glyphicon-log-out"></span>
                 {% trans "Quit" %}
             </button>
-            <h3>{{ player.name|safe }}: {{ player.points }} {% trans "Points" %}</h3>
-            <h4>{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h4>
-            <h5>{% trans "Created by" %} {{ game.creator|safe }}</h5>
-            <h5>{% trans "Host: " %} {{ instance.host|safe }}</h5>
-            <p>{% trans "Standard Jiggly jigsaw puzzle, size: " %} <span id="lb-size"></span></p>
+            <h3>{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
+			<h4>{% trans 'Type: ' %} <span id="lb-size"></span> {% trans 'Jigsaw' %}&nbsp; {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
+			<h5>{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
         </div>
     </div>
+	<div id="main-body">
+	</div>
     {% include 'jigsaw/footer.html' %}
     <script type="text/javascript">
         // Jigsaw-like document layout + print preview system by Alex Yu 2016
@@ -340,20 +340,21 @@
         var graded = false;
         // calculate nearby tiles and send to server for grading
         function grade(){
+			if (graded) return;
             diag(
                 "{% trans 'Submit and Score Round' %}",
                 "{% trans 'Are you sure you want to submit?<br/>The puzzle will be to the server immediately, and you will not be able to make any further changes.' %}",
                 function(){
                     ajaxGet('/ajax_roundgrade/', {id:{{ round.pk }}, state: _getState()}, function(content){
 						$('#site-footer').css('min-width','0');
-						$('.page').css('min-width','0');
-                        $(body).html(content);
+                        $('#document-body').html(content);
                         graded = true;
                     });
                 }
             )
         }
         function setText(pside, text) {
+			if (graded) return;
             var elem = null;
             switch (pside) {
                 case Side.LEFT:
@@ -376,6 +377,7 @@
             return false;
         }
         function rotate(cell, angle){
+			if (graded) return;
             var id = cell.attr('id').substr(5);
             var oa = rot[id];
             if (rot[id] < 0) rot[id] += 360;
@@ -390,12 +392,14 @@
             rot[id] = (rot[id]+angle) % 360;
         }
         function rotateImmediate(cell, angle){
+			if (graded) return;
             $(cell).css('transform', 'rotate(' + angle + 'deg)')
             var id = cell.attr('id').substr(5);
             rot[id] = (rot[id]+angle) % 360;
             if (rot[id] < 0) rot[id] += 360;
         }
         function nextPage() {
+			if (graded) return;
             curpage = document.createElement("div");
             body.appendChild(curpage);
             jqpage = $(curpage);
@@ -406,11 +410,13 @@
             cells = 0;
         }
         function nextRow() {
+			if (graded) return;
             if (rows >= rowsPerPage) nextPage();
             rows++;
             cells = 0;
         }
         function nextCell() {
+			if (graded) return;
             if (cells >= cellsPerRow) nextRow();
             curcell = document.createElement("div");
             curpage.appendChild(curcell);
@@ -448,6 +454,7 @@
             cells ++;
         }
         function layoutWords(words){
+			if (graded) return;
             nextPage();
             nextRow();
             if (!words.length) {
@@ -473,17 +480,29 @@
                     for (var i=r; i<r+cellsPerRow; ++i){
                         if (i-cellsPerRow >= words.length || (i < cellsPerRow && i > words.length) ) break;
                         nextCell();
-                        if (i != r && i-1 < words.length)
+						if (i != r && i-1 < words.length){
                             setText(Side.LEFT, words[i-1][1]);
+							if (words[i-1][3] == '0'){
+								$(_lp).attr('wid', words[i-1][2]);
+							}
+						}
                         if (i != r+cellsPerRow-1 && i < words.length){
                             setText(Side.RIGHT, words[i][0]);
-                            $(_rp).attr('wid', words[i][2]);
+							if (words[i][3] == '1'){
+								$(_rp).attr('wid', words[i][2]);
+							}
                         }
-                        if (r != 0 && i-5 < words.length)
+						if (r != 0 && i-5 < words.length){
                             setText(Side.TOP, words[i-cellsPerRow][1]);
+							if (words[i-cellsPerRow][3] == '0'){
+								$(_tp).attr('wid', words[i-cellsPerRow][2]);
+							}
+						}
                         if (i+vwordsPerRow < words.length){
                             setText(Side.BOTTOM, words[i+vwordsPerRow][0]);
-                            $(_bp).attr('wid', words[i+vwordsPerRow][2]);
+							if (words[i+vwordsPerRow][3] == '1'){
+								$(_bp).attr('wid', words[i+vwordsPerRow][2]);
+							}
                         }
                     }
                 }
@@ -524,6 +543,7 @@
         var pl, pt, il, it;
         var curtop = 1;
         function cellMouseDown(e){
+			if (graded) return;
             drag = e.target.id;
             $(e.target).css('z-index',curtop);
             curtop++;
@@ -534,6 +554,7 @@
             e.preventDefault();
         }
         function clabelMouseDown(e){
+			if (graded) return;
             drag = $(this).parent().attr('id');
             $(this).parent().css('z-index',curtop);
             curtop++;
@@ -543,6 +564,7 @@
             it = e.pageY;
         }
         function cellMouseMove(e){
+			if (graded) return;
             if (drag){
                 var dragged = $('#' + drag);
                 var y = dragged.offset().top+e.pageY-pt;
@@ -558,6 +580,7 @@
             }
         }
         function cellMouseUp(e){
+			if (graded) return;
             if (drag){
                 var dragged = $('#' + drag);
                 if (Math.abs(e.pageX-il) < 5 && Math.abs(e.pageY-it) < 5){
@@ -641,7 +664,7 @@
         }
         $(document).ready(function () {
 			$('body').css('zoom', '100%');
-            body = document.getElementById('document-body');
+            body = document.getElementById('main-body');
             $('#btn-grade').click(grade);
             window.addEventListener("keydown",function (e) {
                 if ((e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) && !graded) {
@@ -651,9 +674,9 @@
             ajaxGet('/ajax_getwords/', {'id':{{ round.pk }}}, function(content){
                 var words=[];
                 var spl = content.split('\n');
-                for (var i = 0; i < spl.length; i+=3) {
+                for (var i = 0; i < spl.length; i+=4) {
                     if (spl[i])
-                        words.push([spl[i], spl[i + 1], spl[i + 2]]);
+                        words.push([spl[i], spl[i + 1], spl[i + 2], spl[i + 3]]);
                 }
                 layoutWords(words);
                 words = null

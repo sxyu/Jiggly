@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^ajax_rounddel/$', views.delRound, name='del_round'),
     url(r'^ajax_roundmod_name/$', views.modRoundName, name='mod_round_name'),
     url(r'^ajax_roundmod_points/$', views.modRoundPoints, name='mod_round_points'),
+    url(r'^ajax_roundmod_type/$', views.modRoundType, name='mod_round_type'),
     url(r'^ajax_roundmod_wordadd/$', views.modRoundAddWord, name='mod_round_add_word'),
     url(r'^ajax_roundmove/$', views.moveRound, name='move_round'),
 
@@ -30,6 +31,7 @@ urlpatterns = [
     url(r'^ajax_wordmod/$', views.modWord, name='mod_word'),
 
     url(r'^ajax_getwords/$', views.getWords, name='get_words'),
+    url(r'^ajax_getwords_unmatched/$', views.getWordsUnmatched, name='get_words_unmatched'),
     url(r'^ajax_roundgrade/$', views.gradeRound, name='grade_round'),
 
     url(r'^ajax_startsession/$', views.startSession, name='start_session'),

@@ -109,6 +109,21 @@
 							   oninput="update_round_name({{ round.pk }})" onkeydown="verifyValid(event)" 
                                placeholder="{% trans "Round Name"%}" aria-describedby="basic-addon2" value="{{ round.name }}" />
                     </div><br />
+                    <p>{% trans 'Round type' %}</p>
+                    <div class="dropdown" title="
+                         {% trans "The type of the round." %}
+                         ">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+							<span class="glyphicon glyphicon-knight"></span> <span id="lb-rnd-type-{{ round.pk }}">
+								{{ round.getType }}
+							</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+							<li><a id="btn-rnd-{{ round.pk }}-jigsawt" onclick="update_round_type({{ round.pk }},'J')">{% trans 'Jigsaw' %}</a></li>
+							<li><a id="btn-rnd-{{ round.pk }}-matchingt" onclick="update_round_type({{ round.pk }}, 'M')">{% trans 'Matching' %}</a></li>
+                        </ul>
+                    </div><br />
                     <p>{% trans 'Perfect Round Bonus' %}</p>
                     <div class="dropdown" title="
                          {% trans "The number of points players gain after they complete this round perfectly" %}
@@ -252,7 +267,7 @@
         }
 		{% endif %}
         var ugn_to, ugc_to, g_to;
-        function autoTo(timer, callback, time) {
+        function autoTimeout(timer, callback, time) {
             if (timer) clearTimeout(timer);
             if (!time) time = 600;
             timer = setTimeout(callback, time);
@@ -267,14 +282,14 @@
             });
         }
         function update_game_name() {
-            autoTo(ugn_to, _update_game_name);
+            autoTimeout(ugn_to, _update_game_name);
         }
         function _update_game_creator() {
             ajaxPost('/ajax_gamemod_creator/', { 'id': "{{ game.key }}", 'content': $('#tb-creator').val() }, function () {
             });
         }
         function update_game_creator() {
-            autoTo(ugc_to, _update_game_creator);
+            autoTimeout(ugc_to, _update_game_creator);
         }
         function update_game_public(content) {
             ajaxPost('/ajax_gamemod_public/', { 'id': "{{ game.key }}", 'content': content }, function () {
@@ -287,14 +302,14 @@
             });
         }
         function add_round(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 ajaxPost('/ajax_gamemod_roundadd/', { 'id': "{{ game.key }}" }, function (content) {
                     newname = $('#rounds-container').append(content);
                 });
             }, 200);
         }
         function update_round_name(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 newname = $('#tb-rnd-' + id + '-name').val().trim();
                 if (!newname) newname = "{% trans 'Untitled Round' %}";
                 ajaxPost('/ajax_roundmod_name/', { 'key': "{{ game.key }}", 'id': id, 'content': newname }, function (content) {
@@ -303,25 +318,34 @@
             });
         }
         function add_round_word(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 ajaxPost('/ajax_roundmod_wordadd/', { 'key': "{{ game.key }}", 'id': id }, function (content) {
                     newname = $('#rnd-' + id + '-words-list').append(content);
                 });
-            },200);
+            },100);
         }
         function update_round_points(id, points) {
-            autoTo(g_to, function () {
+			if ($('#lb-rnd-points-' + id).text() == points) return;
+			$('#lb-rnd-points-' + id).text(points);
+            autoTimeout(g_to, function () {
                 ajaxPost('/ajax_roundmod_points/', { 'key': "{{ game.key }}", 'id': id, 'content': points }, function () {
-                    $('#lb-rnd-points-' + id).text(points);
                 });
-            },200);
+            },100);
+        }
+        function update_round_type(id, type_name) {
+			if ($('#lb-rnd-type-' + id).text() == type_name) return;
+            autoTimeout(g_to, function () {
+                ajaxPost('/ajax_roundmod_type/', { 'key': "{{ game.key }}", 'id': id, 'content': type_name }, function (content) {
+                    $('#lb-rnd-type-' + id).text(content);
+                });
+            },100);
         }
         function move_round_up(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 ajaxPost('/ajax_roundmove/', { 'key': "{{ game.key }}", 'id': id }, function (content) {
                     if (content == "OK") {
                         $("#row-rnd-" + id).insertBefore($("#row-rnd-" + id).prev());
-                        $("#row-rnd-" + id).css('background-color', "#fd7")
+                        $("#row-rnd-" + id).css('background-color', "#fd7");
                         setTimeout(function () {
                             $("#row-rnd-" + id).css('background-color', "#fff")
                         }, 1000);
@@ -330,11 +354,11 @@
             },200);
         }
         function move_round_down(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 ajaxPost('/ajax_roundmove/', { 'key': "{{ game.key }}", 'id': id, 'down': true }, function (content) {
                     if (content == "OK") {
                         $("#row-rnd-" + id).insertAfter($("#row-rnd-" + id).next());
-                        $("#row-rnd-" + id).css('background-color', "#fd7")
+                        $("#row-rnd-" + id).css('background-color', "#fd7");
                         setTimeout(function () {
                             $("#row-rnd-" + id).css('background-color', "#fff")
                         }, 600);
@@ -354,7 +378,7 @@
             );
         }
         function update_word_word(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 newname = $('#tb-wd-' + id + '-word').val().trim();
                 if (!newname) newname = "{% trans 'Word' %}";
                 ajaxPost('/ajax_wordmod/', { 'key': "{{ game.key }}", 'id': id, 'word': newname }, function () {
@@ -362,26 +386,26 @@
             });
         }
         function update_word_meaning(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 newname = $('#tb-wd-' + id + '-meaning').val().trim();
                 ajaxPost('/ajax_wordmod/', { 'key': "{{ game.key }}", 'id': id, 'meaning': newname }, function () {
                 });
             });
         }
         function update_word_points(id) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 newname = $('#tb-wd-' + id + '-points').val().trim();
                 ajaxPost('/ajax_wordmod/', { 'key': "{{ game.key }}", 'id': id, 'points': newname }, function () {
                 });
             });
         }
         function del_word(id, rid) {
-            autoTo(g_to, function () {
+            autoTimeout(g_to, function () {
                 ajaxPost('/ajax_worddel/', { 'key': "{{ game.key }}", 'id': id }, function () {
                     $('#tr-wd-' + id).remove();
                     $('#btn-add-word-' + rid).css('display', 'inline')
                 });
-            }, 200);
+            }, 100);
         }
     </script>
 </body>

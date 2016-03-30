@@ -1,0 +1,454 @@
+{% load i18n %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'jigsaw/resources.html' %}
+	<title>{% trans 'Matching Round: '%}{{ round.name|safe }} - {{ game.name|safe }} | Jiggly</title>
+    <style type="text/css">
+        div#site-banner {
+            background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
+            background-size: cover;
+            color: #eee;
+            padding: 5em 5em 2em 5em;
+            margin-top:-3em;
+            border-radius: 0;
+            position: relative;
+        }
+        body{
+            background-color:#3a3a3a;
+        }
+        #primary-nav {
+            z-index:10000000000;
+        }
+        #site-footer {
+            width:100%;
+            min-width:1200px;
+        }
+        #document-body{
+            padding-top:6em;
+        }
+        .page {
+            margin: 0;
+            position:relative;
+            page-break-after:always;
+            margin-top:3em;
+            height:100%;
+            min-height:500px;
+            background: url("{% static 'images/spring_bokeh.jpg' %}") no-repeat center center;
+            background-size:cover;
+            width:100%;
+            min-width:1200px;
+        }
+		#canvas{
+			width:100%; height:100%;
+			position:absolute;
+			top:0; left:0;
+			z-index:50;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events:none;
+		}
+		#lists{
+			width:100%; height:100%;
+			position:absolute;
+			top:0; left:0;
+			z-index:100;
+			padding:20px 70px;
+		}
+		.page ul{
+			list-style:none;
+			padding-left:0;
+			display:inline-block;
+			text-align:center;
+			color:#fff;
+			width:20em;
+		}
+		.page #list-r{
+			margin-left:20em;
+		}
+		.page ul li{
+			padding: 10px 25px;
+			line-height: 4em;
+			margin: 25px 0;
+			border-radius: 7px;
+			border: 4px solid transparent;
+			white-space: nowrap;
+			-o-text-overflow: ellipsis;
+			-moz-text-overflow: ellipsis;
+			-webkit-text-overflow: ellipsis;
+			text-overflow: ellipsis;
+			/*border-color: #3c3c3c;*/
+			-o-transition: border-color 0.4s ease;
+			-moz-transition: border-color 0.4s ease;
+			-webkit-transition: border-color 0.4s ease;
+			-ms-transition: border-color 0.4s ease;
+			transition: border-color 0.4s ease;
+			overflow:hidden;
+		}
+        div#screen-header {
+            padding: 0 5em;
+            color: #fff;
+        }
+
+        /* score screen styles */
+        div#screen-header table{
+            color: #fff;
+        }
+        div#screen-header table tr:hover{
+            background: #4d4d4d;
+        }
+        tr.correct{
+            background-color:#445544
+        }
+        div#screen-header table tr.correct:hover{
+            background-color:#516151
+        }
+        tr.awards{
+            background-color:#333
+        }
+        div#screen-header table tr.awards:hover{
+            background-color:#444
+        }
+        tr span.glyphicon{
+            display:inline-block;
+            height:100%;
+            line-height:22px;
+            vertical-align:middle;
+        }
+    </style>
+</head>
+<body>
+    {% include 'jigsaw/header.html' %}
+    <div id="document-body">
+        <div id="screen-header">
+            {% if instance.system == True %}
+			<h4>{% trans 'Preview / Practice Game' %}</h4>{% else %}
+            <h4>{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
+            <button class="btn btn-primary" style="margin-right:10px; vertical-align:middle" id="btn-grade" title="{% trans 'Submit + Score' %}">
+                <span class="glyphicon glyphicon-edit"></span>
+                {% trans "Submit + Score" %}
+            </button>
+            <button class="btn btn-warning" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="promptQuit()">
+                <span class="glyphicon glyphicon-log-out"></span>
+                {% trans "Quit" %}
+            </button>
+            <h3>{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
+			<h4>{% trans 'Type: ' %} <span id="lb-size"></span> {% trans 'Matching' %}&nbsp; {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
+			<h5>{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
+        </div>
+    </div>
+	<div class="page">
+		<div id="lists">
+			<ul id="list-l">
+			</ul>
+			<ul id="list-r">
+			</ul>
+		</div>
+	   	<canvas id="canvas">
+		</canvas>
+	</div>
+    {% include 'jigsaw/footer.html' %}
+    <script type="text/javascript">
+        var drag = '';
+        var pl, pt, il, it;
+        var curtop = 1;
+		var id = {};
+		var link = {};
+		var rlink = {};
+		var mx, my;
+        function itemMouseDown(e){
+			if (graded) return;
+			if (drag == ''){
+				drag = e.target.id;
+				$(e.target).css('border-color', "#3c3c3c");
+				e.preventDefault();
+			}
+        }
+        function itemMouseMove(e){
+			if (graded) return;
+            if (drag){
+				mx = e.pageX-$('.page').offset().left; my = e.pageY-$('.page').offset().top;
+				redraw();
+            }
+			e.preventDefault();
+        }
+        function itemMouseUp(e){
+			if (graded) return;
+			var found = false;
+            if (drag){
+                var dragged = $('#' + drag);
+				var x = e.pageX, y = e.pageY;
+            	$('.item').each(function(){
+					var ct = $(this).offset().top-5, cl = $(this).offset().left-5;
+					var cb = $(this).offset().top+$(this).outerHeight()+5, cr = $(this).offset().left+$(this).outerWidth()+5;
+					if (y >= ct && y <= cb && x >= cl && x <= cr){
+						var cid = $(this).attr('id');
+						if (cid == drag){
+							if (link[cid] || rlink[cid]){
+								$(this).css('border-color', "#3c3c3c");
+								drag = '';
+								redraw();
+							}
+							found = true;
+							return;	
+						}
+						else{
+							$(this).css('border-color', "#3c3c3c");
+							if (drag[0] == cid[0]){
+								if (drag[0] == 'w' && link[drag]){
+									rlink[link[drag]] = cid;
+									var tmp = null;
+									if (link[cid]){
+										rlink[link[cid]] = drag;
+										tmp = link[cid];
+									}
+									link[cid] = link[drag];
+									if (tmp){
+										link[drag] = tmp;
+									}
+									else {
+										link[drag] = '';
+										$('#' + drag).css('border-color', "transparent");
+									}
+								}
+								else if (drag[0] == 'd' && rlink[drag]){
+									link[rlink[drag]] = cid;
+									var tmp = null;
+									if (rlink[cid]){
+										link[rlink[cid]] = drag;
+										tmp = rlink[cid];
+									}
+									rlink[cid] = rlink[drag];
+									if (tmp){
+										rlink[drag] = tmp; 
+									}
+									else{
+										rlink[drag] = '';
+									   	$('#' + drag).css('border-color', "transparent");
+									}
+								}
+								else{
+									if (!link[cid] && !rlink[cid])
+										$(this).css('border-color', "transparent");
+									$('#' + drag).css('border-color', "transparent");
+								}
+							}
+							else if (drag[0] == 'w'){
+								if (link[drag] != cid){
+									if (link[drag]){
+										rlink[link[drag]] = '';
+										$('#' + link[drag]).css('border-color', "transparent");
+									}
+									if (rlink[cid]){
+										link[rlink[cid]] = '';
+										$('#' + rlink[cid]).css('border-color', "transparent");
+									}
+									link[drag] = cid;
+									rlink[cid] = drag;
+								}
+							}
+							else{
+								if (rlink[drag] != cid){
+									if (rlink[drag]){
+										link[rlink[drag]] = '';
+										$('#' + rlink[drag]).css('border-color', "transparent");
+									}
+									if (link[cid]){
+										rlink[link[cid]] = '';
+										$('#' + link[cid]).css('border-color', "transparent");
+									}
+									link[cid] = drag;
+									rlink[drag] = cid;
+								}
+							}
+							found = true;
+							drag = '';
+							redraw();
+							return;
+						}
+					}
+				});
+            }
+			if (!found){
+				if (drag){
+					dragged.css('border-color', "transparent");
+					if (drag[0] == 'w'){
+						rlink[link[drag]] = '';
+						$('#' + link[drag]).css('border-color', "transparent");
+						link[drag] = '';
+					}
+					else{
+						link[rlink[drag]] = '';
+						$('#' + rlink[drag]).css('border-color', "transparent");
+						rlink[drag] = '';
+					}
+					drag = '';
+					redraw();
+				}
+			}
+			else{
+				e.stopPropagation();
+				e.preventDefault();
+			}
+        }
+        function canvasMouseUp(e){
+			if (graded) return;
+            if (drag){
+                var dragged = $('#' + drag);
+				if (drag[0] == 'w'){
+					rlink[link[drag]] = '';
+					$('#' + link[drag]).css('border-color', "transparent");
+					link[drag] = '';
+				}
+				else{
+					link[rlink[drag]] = '';
+					$('#' + rlink[drag]).css('border-color', "transparent");
+					rlink[drag] = '';
+				}
+				dragged.css('border-color', "transparent");
+				drag = '';
+				redraw();
+            }
+			e.preventDefault();
+        }
+		function _getState(){
+			var ret = "";
+			for (var w in link){
+				if (!w) continue;
+				ret += id[w] + '\\' + $('#'+link[w]).text() + '\n';
+			}
+			return ret;
+		}
+        var graded = false;
+		function grade(){
+			if (graded) return;
+            diag(
+                "{% trans 'Submit and Score Round' %}",
+                "{% trans 'Are you sure you want to submit?<br/>The puzzle will be to the server immediately, and you will not be able to make any further changes.' %}",
+                function(){
+                    ajaxGet('/ajax_roundgrade/', {id:{{ round.pk }}, state: _getState()}, function(content){
+						$('#site-footer').css('min-width','0');
+                        $('#document-body').html(content);
+						redraw();
+                        graded = true;
+                    });
+                }
+            )
+		}
+		function redraw(){
+			if (graded) return;
+			var ctx = document.getElementById('canvas').getContext("2d");
+			ctx.clearRect(0,0,canvas.width, canvas.height);
+			var t = $('#canvas').offset().top;
+			var l = $('#canvas').offset().left;
+			for (var k in link){
+				if (k == '' || k == drag) continue;
+				var w = $('#'+k);
+				var v = link[k];
+				if (v == drag) continue;
+				var d = $('#'+v);
+				if (rlink[v] != k) {
+					link[k] = '';
+					rlink[v] = '';
+					continue;
+				}	
+				var ax = w.offset().left + w.outerWidth() - l - 3, ay = w.offset().top + w.outerHeight()/2 - t;
+				var bx = d.offset().left - l + 3, by = d.offset().top + d.outerHeight()/2 - t;
+				ctx.beginPath();
+				ctx.moveTo(ax, ay);
+				ctx.lineTo(bx, by);
+				ctx.lineWidth=5;
+				ctx.strokeStyle='#3c3c3c';
+				ctx.lineCap='round';
+				ctx.stroke();
+			}
+			if (drag){
+				if (link[drag]){
+					var nxts = link[drag];
+				}
+				else if (rlink[drag]){
+					var nxts = rlink[drag];
+				}
+				else{
+					var nxts = drag;
+				}
+				nxt = $('#' + nxts);
+				if (nxts[0] == 'w'){
+					var ax = nxt.offset().left + nxt.outerWidth() - l - 3, ay = nxt.offset().top + nxt.outerHeight()/2 - t;
+				}
+				else{
+					var ax = nxt.offset().left - l + 3, ay = nxt.offset().top + nxt.outerHeight()/2 - t;
+				}
+				ctx.beginPath();
+				ctx.moveTo(ax, ay);
+				ctx.lineTo(mx, my);
+				ctx.lineWidth=5;
+				ctx.strokeStyle='#3c3c3c';
+				ctx.lineCap='round';
+				ctx.stroke();
+			}
+		}
+        $(document).ready(function () {
+			$('body').css('zoom', '100%');
+            $('#btn-grade').click(grade);
+            window.addEventListener("keydown",function (e) {
+                if ((e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) && !graded) {
+                    e.preventDefault();
+                }
+            })
+            ajaxGet('/ajax_getwords_unmatched/', {'id':{{ round.pk }}}, function(content){
+                var spl = content.split('\n');
+                for (var i = 0; i < spl.length / 3 * 2; i+=2) {
+					if (spl[i]){
+						elem = document.createElement('li');
+						elem.id = "w-" + i/2;
+						jqe = $(elem);
+						jqe.text(spl[i]);
+						jqe.addClass('draggable');
+						jqe.addClass('item');
+						$('#list-l')[0].appendChild(elem);
+						rgba = "rgba(" + Math.round(Math.random() * 200) + ", " + Math.round(Math.random() * 200) + "," + Math.round(Math.random() * 200) + ",1)";
+						jqe.css('background', rgba);
+						id[elem.id] = spl[i + 1];
+					}
+                }
+                for (var i = spl.length/3*2; i < spl.length; i++) {
+					if (spl[i]){
+						elem = document.createElement('li');
+						elem.id = "d-" + (i-spl.length/3*2);
+						jqe = $(elem);
+						jqe.addClass('draggable');
+						jqe.addClass('item');
+						$('#list-r')[0].appendChild(elem);
+						rgba = "rgba(" + Math.round(Math.random() * 200) + ", " + Math.round(Math.random() * 200) + "," + Math.round(Math.random() * 200) + ",1)";
+						jqe.css('background', rgba);
+						jqe.text(spl[i]);
+					}
+				}
+                $('.item').each(function(){
+                    $(this).mousedown(itemMouseDown);
+                    $(this).mouseup(itemMouseUp);
+                    $(this).contextmenu(function(){ return false });
+                })
+				$('.page').mousemove(itemMouseMove);
+				$('.page').contextmenu(function(){ return false });
+				$('#lists').css('min-height', (document.getElementById('list-l').offsetHeight + 40) + "px");
+				$('.page').css('min-height', document.getElementById('lists').offsetHeight + "px");
+                $(document).mouseup(canvasMouseUp);
+				var cvs = document.getElementById('canvas');
+				cvs.width = cvs.offsetWidth;
+				cvs.height = cvs.offsetHeight;
+            });
+        })
+    </script>
+</body>
+</html>

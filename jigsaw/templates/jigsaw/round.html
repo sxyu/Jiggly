@@ -19,6 +19,21 @@
         <input type="text" id="tb-rnd-{{ round.pk }}-name" maxlength=50 class="form-control" oninput="update_round_name({{ round.pk }})"
                placeholder="{% trans " Round Name"%}" aria-describedby="basic-addon2" value="{{ round.name }}" />
     </div><br />
+	<p>{% trans 'Round type' %}</p>
+	<div class="dropdown" title="
+		 {% trans "The type of the round." %}
+		 ">
+		<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+			<span class="glyphicon glyphicon-knight"></span> <span id="lb-rnd-type-{{ round.pk }}">
+				{{ round.getType }}
+			</span>
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			<li><a id="btn-rnd-{{ round.pk }}-jigsawt" onclick="update_round_type({{ round.pk }},'J')">{% trans 'Jigsaw' %}</a></li>
+			<li><a id="btn-rnd-{{ round.pk }}-matchingt" onclick="update_round_type({{ round.pk }}, 'M')">{% trans 'Matching' %}</a></li>
+		</ul>
+	</div><br />
     <p>{% trans 'Perfect Round Bonus' %}</p>
     <div class="dropdown" title="
          {% trans "The number of points players gain after they complete this round perfectly" %}

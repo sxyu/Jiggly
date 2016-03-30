@@ -149,7 +149,7 @@ def report(request):
             raise Http404
         return render(request, 'jigsaw/report.html', {'p_join':True, 'instance':g, 'rounds':g.game.rounds.all(), 'game': g.game, 'in_game':True, 'supervisor': True, 'scoreboard':True})
     else:
-        raise Http404
+        return HttpResponseRedirect(reverse('scoreboard'))
 
 class reportPDF(PDFTemplateView):
     template_name = "jigsaw/reportpdf.html"
@@ -185,7 +185,11 @@ def play(request):
         if player.round is None:
             return HttpResponseRedirect(reverse('scoreboard'))
         else:
-            return render(request, 'jigsaw/play.html', {'p_join':True, 'game':player.round.game, 'round':player.round, 'player':player,'instance':player.instance, 'in_game':True})
+            if player.round.type:
+                type = player.round.getTypeAlias()
+                return render(request, 'jigsaw/play_%s.html' % type, {'p_join':True, 'game':player.round.game, 'round':player.round, 'player':player,'instance':player.instance, 'in_game':True, 'type':type})
+            else:
+                return render(request, 'jigsaw/play_jigsaw.html', {'p_join':True, 'game':player.round.game, 'round':player.round, 'player':player,'instance':player.instance, 'in_game':True, 'type':'jigsaw'})
     else:
         raise Http404
 
@@ -213,16 +217,52 @@ def changeLang(request):
 @csrf_exempt
 @ajax
 def getWords(request):
+    try:
+        if request.method == "GET":
+            id = request.GET['id']
+            r = get_object_or_404(Round, pk=id)
+            words = []
+            words += r.words.all()
+            from random import shuffle, seed, randint
+            seed()
+            shuffle(words)
+            t = []
+            for w in words:
+                r = randint(0,1)
+                if r:
+                    t += [w.word, w.meaning, str(w.pk), '1']
+                else:
+                    t += [w.meaning, w.word, str(w.pk), '0']
+            return '\n'.join(t)
+    except Exception, ex:
+        return str(ex)
+
+@csrf_exempt
+@ajax
+def getWordsUnmatched(request):
     if request.method == "GET":
         id = request.GET['id']
         r = get_object_or_404(Round, pk=id)
         words = []
         words += r.words.all()
-        from random import shuffle
+        from random import shuffle, seed, randint
+        seed()
         shuffle(words)
         t = []
+        df = [x.meaning for x in words]
         for w in words:
-            t += [w.word, w.meaning, str(w.pk)]
+            t += [w.word, str(w.pk)]
+        
+        for i in range(2):
+            for d in range(0,len(df)-1,2):
+                rd = randint(0,1);
+                if rd:
+                    df[d], df[d+1] = df[d+1], df[d]
+            for d in range(1,len(df)-1,2):
+                rd = randint(0,1);
+                if rd:
+                    df[d], df[d+1] = df[d+1], df[d]
+        t += df
         return '\n'.join(t)
 
 @csrf_exempt
@@ -325,7 +365,7 @@ def modGameAddRound(request):
         if request.method == "POST":
             id = request.POST['id']
             g = get_object_or_404(Game, key=id)
-            r = g.rounds.create(order=g.last, name=_("New Round"))
+            r = g.rounds.create(order=g.last, name=_("New Round"), type='J')
             g.last += 1
             g.save()
             return render(request, 'jigsaw/round.html', {'round':r, 'game':g})
@@ -361,6 +401,23 @@ def modRoundPoints(request):
             bonus = request.POST['content']
             r.points = bonus
             r.save()
+    except:
+        return "Failed"
+
+@ajax
+@csrf_exempt
+def modRoundType(request):
+    try:
+        if request.method == "POST":
+            id = request.POST['id']
+            r = get_object_or_404(Round, pk=id)
+            modkey = request.POST['key']
+            if modkey != r.game.key:
+                return HttpResponseForbidden("403")
+            type_name = request.POST['content']
+            r.type = type_name
+            r.save()
+            return r.getType()
     except:
         return "Failed"
 
