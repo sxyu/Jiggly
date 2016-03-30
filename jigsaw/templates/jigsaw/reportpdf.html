@@ -76,25 +76,25 @@
                         <tr>
                     <td>
                         {% if rr|correct:w.word %}
-                        <font color="darkseagreen">
-                            {{ w.word }}</font>
-                        {% else %}
                             {{ w.word }}
+                        {% else %}
+                        <font color="#777">
+                            {{ w.word }}</font>
                         {% endif %}
                     <td>
                         {% if rr|correct:w.word %}
-                        <font color="darkseagreen">
-                            {{ w.meaning }}</font>
-                        {% else %}
                             {{ w.meaning }}
+                        {% else %}
+                        <font color="#777">
+                            {{ w.meaning }}</font>
                         {% endif %}
                     </td>
                     <td>
                         {% if rr|correct:w.word %}
-                        <font color="darkseagreen">
-                            {{ w.points }} / {{ w.points }}</font>
+                            {{ w.points }} / {{ w.points }}
                         {% else %}
-                        0 / {{ w.points }}
+                        <font color="#777">
+                        0 / {{ w.points }}</font>
                         {% endif %}
                     </td>
                     </tr>

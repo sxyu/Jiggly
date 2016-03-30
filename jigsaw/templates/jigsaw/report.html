@@ -25,7 +25,33 @@
     {% include 'jigsaw/header.html' %}
     <div class="container" id="site-body">
         <div class="jumbotron" id="site-banner">
-            <button class="btn btn-warning pull-right" style="vertical-align:middle" id="btn-leave" title="{% trans 'Leave' %}" 
+            {% if instance.system == True %}
+            <h3>{% trans "Report For: " %}{% trans "Preview / Practice Game" %}</h3>{% else %}
+            <h3>{% trans "Report For: " %} {{ instance.alias|safe }}</h3>{% endif %}
+            {% if round and not supervisor %}
+            {% if round.order ==  1 %}
+            <button class="btn btn-primary" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Start' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
+                <span class="glyphicon glyphicon-play"></span>
+                {% trans "Start" %}
+            </button>
+            {% else %}
+            <button class="btn btn-primary" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
+                <span class="glyphicon glyphicon-play"></span>
+                {% trans "Continue" %}
+            </button>
+            {% endif %}
+            {% endif %}
+            <button class="btn btn-primary" style="vertical-align:middle;margin-right:10px" id="btn-return" title="{% trans 'Return to Scoreboard' %}"
+                    onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                {% trans "Return to Scores" %}
+            </button>
+            <a class="btn btn-success" style="vertical-align:middle;margin-right:10px" id="btn-export" title="{% trans 'Save / Print Report (PDF)' %}"
+                    onclick="noCloseWarning=true" href="{% url 'report_pdf' %}" target="_blank">
+                <span class="glyphicon glyphicon-save-file"></span>
+                {% trans "Save or Print (PDF)" %}
+            </a>
+            <button class="btn btn-warning" style="vertical-align:middle" id="btn-leave" title="{% trans 'Leave' %}" 
                     onclick="{% if not round and not supervisor %}noCloseWarning=true;{% endif %}
                         {% if supervisor %}
                          if (ended) 
@@ -38,32 +64,6 @@
                 <span id="btn-leave-icon" class="glyphicon glyphicon-log-out"></span>
                 <span id="btn-leave-text">{% if supervisor %}{% trans "End Game" %}{% else %}{% trans "Quit" %}{% endif %}</span>
             </button>
-            <a class="btn btn-success pull-right" style="vertical-align:middle;margin-right:10px" id="btn-leave" title="{% trans 'Save / Print Report (PDF)' %}"
-                    onclick="noCloseWarning=true" href="{% url 'report_pdf' %}" target="_blank">
-                <span class="glyphicon glyphicon-save-file"></span>
-                {% trans "Save or Print (PDF)" %}
-            </a>
-            <button class="btn btn-primary pull-right" style="vertical-align:middle;margin-right:10px" id="btn-leave" title="{% trans 'Return to Scoreboard' %}"
-                    onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                {% trans "Return to Scores" %}
-            </button>
-            {% if round and not supervisor %}
-            {% if round.order ==  1 %}
-            <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Start' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
-                <span class="glyphicon glyphicon-play"></span>
-                {% trans "Start" %}
-            </button>
-            {% else %}
-            <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
-                <span class="glyphicon glyphicon-play"></span>
-                {% trans "Continue" %}
-            </button>
-            {% endif %}
-            {% endif %}
-            {% if instance.system == True %}
-            <h3>{% trans "Report For: " %}{% trans "Preview / Practice Game" %}</h3>{% else %}
-            <h3>{% trans "Report For: " %} {{ instance.alias|safe }}</h3>{% endif %}
         </div>
         <div class="row">
             {% if instance.system == True %}

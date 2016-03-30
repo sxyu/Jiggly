@@ -114,27 +114,29 @@ def game(request, id):
     return _autoDelSession(request, r)
 
 def scoreboard(request):
-    gid = request.COOKIES.get('instanceid') 
     pid = request.COOKIES.get('psessionid') 
     if not pid and pid != 0:
         raise Http404
     if pid == '0':
+        gid = request.COOKIES.get('instanceid') 
         key = request.COOKIES.get('instancemankey') 
-        gm = get_object_or_404(Game, key=key)
+        try:
+            gm = Game.objects.get(key=key)
+        except:
+            return HttpResponseRedirect('/?clear=true')
         g = get_object_or_404(GameInstance, pk=gid)
         if gm != g.game:
             raise Http404
         return render(request, 'jigsaw/scoreboard.html', {'p_join':True, 'instance':g, 'game': gm, 'in_game':True, 'supervisor': True, 'scoreboard':True})
     else:
-        player = get_object_or_404(Player, pk=pid)
-        if not gid:
-            g = player.instance
-            r = render(request, 'jigsaw/scoreboard.html', {'p_join':True, 'instance':g, 'session': player, 'round':player.round, 'game':g.game, 'in_game':True, 'scoreboard':True})
-            _setCookie(r, 'instanceid', g.id)
-            return r
-        else:
-            g = get_object_or_404(GameInstance, pk=gid)
-            return render(request, 'jigsaw/scoreboard.html', {'p_join':True, 'instance':g, 'session': player, 'round':player.round, 'game':g.game, 'in_game':True, 'scoreboard':True})
+        try:
+            player = Player.objects.get(pk=pid)
+        except:
+            return HttpResponseRedirect('/?clear=true')
+        g = player.instance
+        r = render(request, 'jigsaw/scoreboard.html', {'p_join':True, 'instance':g, 'session': player, 'round':player.round, 'game':g.game, 'in_game':True, 'scoreboard':True})
+        _setCookie(r, 'instanceid', g.id)
+        return r
 
 def report(request):
     gid = request.COOKIES.get('instanceid') 
@@ -181,7 +183,10 @@ class reportPDF(PDFTemplateView):
 def play(request):
     pid = request.COOKIES.get('psessionid') 
     if pid and pid >= 0:
-        player = get_object_or_404(Player, pk=pid)
+        try:
+            player = Player.objects.get(pk=pid)
+        except:
+            return HttpResponseRedirect('/?clear=true')
         if player.round is None:
             return HttpResponseRedirect(reverse('scoreboard'))
         else:
@@ -567,6 +572,8 @@ def startSession(request):
                 g = GameInstance.objects.get(alias__iexact=alias, ended=False)
             round = g.game.first()
             name = request.POST['name']
+            if not name:
+                return ''
             p = Player.objects.create(instance=g, name=name, round=round)
             return p.pk
     except:

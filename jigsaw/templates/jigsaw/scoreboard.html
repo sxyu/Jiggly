@@ -28,35 +28,37 @@
     {% include 'jigsaw/header.html' %}
     <div class="container" id="site-body">
         <div class="jumbotron" id="site-banner">
-            <button class="btn btn-warning pull-right" style="vertical-align:middle" id="btn-leave" title="{% trans 'Leave' %}" 
-                    onclick="{% if not round and not supervisor %}noCloseWarning=true;{% endif %}
-                        {% if supervisor %}
-                         if (ended) 
-                             delGameInstance({{ instance.pk }})
-                         else
-                             endGameInstance({{ instance.pk }})
-                        {% else %}promptQuit()
-                    {% endif %};
-                     ">
-                <span id="btn-leave-icon" class="glyphicon glyphicon-log-out"></span>
-                <span id="btn-leave-text">{% if supervisor %}{% trans "End Game" %}{% else %}{% trans "Quit" %}{% endif %}</span>
-            </button>
-            {% if supervisor %}
-            <button class="btn btn-success pull-right" style="vertical-align:middle;margin-right:10px" id="btn-leave" title="{% trans 'Report' %}"
-                    onclick="noCloseWarning=true;window.location.href = '{% url 'report' %}'">
-                <span class="glyphicon glyphicon-save-file"></span>
-                {% trans "Report" %}
-            </button>
-            {% endif %}
-            {% if round and not supervisor %}
-            <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
-                <span class="glyphicon glyphicon-play"></span>
-                {% trans "Continue" %}
-            </button>
-            {% endif %}
             {% if instance.system == True %}
             <h3>{% trans "Preview / Practice Game" %}</h3>{% else %}
             <h3>{% trans "Game:" %} {{ instance.alias|safe }}</h3>{% endif %}
+			<div id="control-btns">
+				{% if supervisor %}
+				<button class="btn btn-success" style="vertical-align:middle;margin-right:10px" id="btn-report" title="{% trans 'Report' %}"
+						onclick="noCloseWarning=true;window.location.href = '{% url 'report' %}'">
+					<span class="glyphicon glyphicon-save-file"></span>
+					{% trans "Report" %}
+				</button>
+				{% endif %}
+				{% if round and not supervisor %}
+				<button class="btn btn-primary" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true; window.location.href = '{% url 'play' %}'">
+					<span class="glyphicon glyphicon-play"></span>
+					{% trans "Continue" %}
+				</button>
+				{% endif %}
+				<button class="btn btn-warning" style="vertical-align:middle" id="btn-leave" title="{% trans 'Leave' %}" 
+						onclick="{% if not round and not supervisor %}noCloseWarning=true;{% endif %}
+							{% if supervisor %}
+							 if (ended) 
+								 delGameInstance({{ instance.pk }})
+							 else
+								 endGameInstance({{ instance.pk }})
+							{% else %}promptQuit()
+						{% endif %};
+						 ">
+					<span id="btn-leave-icon" class="glyphicon glyphicon-log-out"></span>
+					<span id="btn-leave-text">{% if supervisor %}{% trans "End Game" %}{% else %}{% trans "Quit" %}{% endif %}</span>
+				</button>
+			</div>
         </div>
         <div class="row">
             {% if not supervisor %}<br />
@@ -72,7 +74,7 @@
                     {% trans "You've finished " %}{{ round.completeCount }} {% trans "of" %} {{ game.rounds.all|length }} {% trans 'round'%}{{ game.rounds.all|pluralize }}<br />
                     {% endif %}
                     <span id="next-round-desc">
-                    {% trans "The next round is:" %} {{ round.name|safe }} ({% trans "Round # " %}{{ round.order }})<br />{% trans "Ready? Press 'continue' (top right) to start!" %}
+                    {% trans "The next round is:" %} {{ round.name|safe }} ({% trans "Round # " %}{{ round.order }})<br />{% trans "Ready? Press 'continue' (top) to start!" %}
                     {% else %}
                     {% trans "You've finished all of " %} {{ game.rounds.all|length }} {% trans 'round'%}{{ game.rounds.all|pluralize }}<br />
                     {% endif %}

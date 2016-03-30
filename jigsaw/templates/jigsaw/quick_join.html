@@ -20,6 +20,10 @@
     function _join() {
         var alias = $('#tb-join-alias').val();
         var name = $('#tb-join-name').val();
+		if (name.trim() == ""){
+			$('#lb-warning').text("{% trans 'Name cannot be empty' %}");
+			return;
+		}
         ajaxPost('/ajax_startsession/', { 'alias': alias, 'name': name }, function (content) {
             if (content) {
                 setPermCookie('psessionid', content);

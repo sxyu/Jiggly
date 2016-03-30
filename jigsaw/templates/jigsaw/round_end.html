@@ -1,22 +1,22 @@
 {% load i18n %}
 {% load staticfiles %}
 <div class="jumbotron" id="site-banner">
-    <button class="btn btn-warning pull-right" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="window.location.href = '/?clear=true'">
-        <span class="glyphicon glyphicon-log-out"></span>
-        {% trans "Quit" %}
-    </button>
+    <h2 id="lb-game-name">{{ game.name }}</h2>
     {% if round.next %}
-    <button class="btn btn-primary pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
+    <button class="btn btn-primary" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
         <span class="glyphicon glyphicon-play"></span>
         {% trans "Continue to Scores" %}
     </button>
     {% else %}
-    <button class="btn btn-success pull-right" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
+    <button class="btn btn-success" style="margin-right:10px;vertical-align:middle" id="btn-next" title="{% trans 'Continue' %}" onclick="noCloseWarning=true;window.location.href = '{% url 'scoreboard' %}'">
         <span class="glyphicon glyphicon-play"></span>
         {% trans "Finish + See Scores" %}
     </button>
     {% endif %}
-    <h2 id="lb-game-name">{{ game.name }}</h2>
+    <button class="btn btn-warning" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="window.location.href = '/?clear=true'">
+        <span class="glyphicon glyphicon-log-out"></span>
+        {% trans "Quit" %}
+    </button>
 </div>
 <div id="screen-header">
     {% if session %}
