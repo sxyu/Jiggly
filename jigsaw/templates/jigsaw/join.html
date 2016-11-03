@@ -140,10 +140,12 @@
             $('#tb-name').focus()
             checkAlias();
         }
+		var avalid = false, nvalid = false;
         function checkAlias() {
             if ($('#tb-alias').val().trim() == "") {
                 $('#lb-warning').text("{% trans 'Alias cannot be empty.' %}");
                 $('#btn-join').hide();
+				avalid = false;
                 return;
             }
             ajaxGet('/ajax_aliasexists/', { 'alias': $('#tb-alias').val() }, function (content) {
@@ -152,8 +154,9 @@
                     $('#lb-warning').text("{% trans 'No game with specified alias found.' %}");
                 }
                 else {
-                    $('#btn-join').show();
                     $('#lb-warning').text("");
+					avalid = true;
+                    if (nvalid) $('#btn-join').show();
                 }
             });
         }
@@ -161,11 +164,12 @@
             if ($('#tb-name').val().trim() == "") {
                 $('#lb-name-warning').text("{% trans 'Name cannot be empty.' %}");
                 $('#btn-join').hide();
-                return;
+				nvalid = false;
             }
 			else{
                 $('#lb-name-warning').text("");
-				$('#btn-join').show();
+				nvalid = true;
+                if (avalid) $('#btn-join').show();
 			}
 		}
         function update() {

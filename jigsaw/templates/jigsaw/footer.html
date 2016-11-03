@@ -119,7 +119,11 @@
             "{% trans 'Are you sure you want to leave the game? You will not be able to come back to it without restarting.' %}",
             function(){
                 noCloseWarning = true; 
-                window.location.href = "/?clear=true";
+				{% if instance.system or supervisor %}
+				window.location.href = "/redir/{% url 'game' instance.game.key %}/?clear=true";
+				{% else %}
+				window.location.href = "/redir/{% url 'index' %}/?clear=true";
+				{% endif %}
             }
         )
     }
@@ -145,6 +149,7 @@
                 ending = true;
                 $('#btn-leave-text').text("{% trans 'Ending Game...' %}");
                 ajaxPost('/ajax_endinstance/', { 'id': curinstance }, function (content) {
+					checkGameEnded();
                 });
             }
         );
@@ -173,7 +178,7 @@
                     function(){
                         noCloseWarning = true;
 						if (content == "2")
-							window.location.href ="{% url 'index' %}?clear=true";
+							window.location.href ="/redir///?clear=true";
 						else
 							window.location.href ="{% url 'scoreboard' %}";
                     }
@@ -191,8 +196,8 @@
                 ajaxPost('/ajax_delinstance/', { 'id': curinstance }, function (content) {
                     setPermCookie('instancemankey', '');
                     setPermCookie('psessionid', '');
-                        noCloseWarning = true; 
-                        window.location.href = "/?clear=true";
+					noCloseWarning = true; 
+					window.location.href = "/redir/{% url 'game' game.key %}/?clear=true";
                 });
             }
         );

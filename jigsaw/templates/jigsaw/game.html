@@ -253,14 +253,20 @@
                      ajaxPost('/ajax_gamedel/', { 'id': "{{ game.key }}", }, function () {
                          rcg = getCookie('recentgames').replace(/['"]+/g, '')
                          rcg = rcg.split('\\');
-                         setPermCookie('gameid', rcg[0]);
                          nrcg = []
                          for (var i = 1; i < rcg.length; i++) {
                              if (rcg[i].trim())
                                  nrcg.push(rcg[i].trim());
                          }
-                         setPermCookie('recentgames', '"' + nrcg.join("\\\\") + '"');
-                         window.location.href = "/game/" + rcg[0];
+						 setPermCookie('recentgames', '"' + nrcg.join("\\\\") + '"');
+						 if (rcg.length > 0 && rcg[0]){
+                         	 setPermCookie('gameid', rcg[0]);
+						     window.location.href = "/game/" + rcg[0];
+						 }
+						 else{
+                         	 setPermCookie('gameid', '');
+							 window.location.href = "/";
+						 }
                      });
                  }
             );

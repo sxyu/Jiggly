@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^game/(?P<id>.+)/$', views.game, name='game'),
     url(r'^print/(?P<gid>.+)-(?P<id>.+)/$', views.printDoc, name='print'),
     url(r'^play/$', views.play, name='play'),
+    url(r'^redir/(?P<url>.+)/$', views.redir, name='redir'),
     url(r'^language/$', views.changeLang, name='change_lang'),
 
     url(r'^ajax_gamedel/$', views.delGame, name='del_game'),

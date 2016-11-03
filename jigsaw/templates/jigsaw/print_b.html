@@ -25,9 +25,9 @@
         }
 
         .page > div.row {
-			text-align:center;
-			vertical-align:middle;
+            padding: 0;
             margin: auto;
+            width: 9.0in;
             height: 1.8in;
         }
 
@@ -175,6 +175,7 @@
         var cellsPerRow = 5, rowsPerPage = 4;
         var _lp, _rp, _tp, _bp;
         var cells=0, rows=0, pages=0;
+        var words=[];
         var footertext="{{ round.name|escapejs|safe }} - {{ game.name|escapejs|safe }} | <em>Jiggly</em> &copy; Alex Yu 2016";
         var Side = {
             LEFT: 0,
@@ -261,7 +262,12 @@
 
             cells ++;
         }
-        function layoutWords(words){
+        function readInput() {
+            // 'read input' from server-side code
+            {% for w in round.words.all %}
+            words.push(["{{ w.word|escapejs|safe }}", "{{ w.meaning|escapejs|safe }}"]);{% endfor %}
+        }
+        function layoutWords(){
             nextPage();
             nextRow();
             if (!words.length) return;
@@ -300,16 +306,8 @@
         $(document).ready(function () {
             body = document.getElementById('document-body');
             $('#btn-print').click(printDocument);
-            ajaxGet('/ajax_getwords/', {'id':{{ round.pk }}}, function(content){
-                var words=[];
-                var spl = content.split('\n');
-                for (var i = 0; i < spl.length; i+=4) {
-                    if (spl[i])
-                        words.push([spl[i], spl[i + 1], spl[i + 2], spl[i + 3]]);
-                }
-                layoutWords(words);
-                words = null
-            });
+            readInput();
+            layoutWords();
             $('.row').each(function(){
                 $(this).css('width', cellsPerRow * 1.8 + 'in');
             });

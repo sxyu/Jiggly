@@ -63,7 +63,7 @@ class Round(models.Model):
 	order = models.IntegerField(editable=False)
 	points = models.IntegerField(default=100)
 	def __str__(self):
-		return "%s - #%s: %s" % (str(self.game), str(self.order), self.name.encode('roundsutf-8'))
+		return "%s - #%s: %s" % (str(self.game), str(self.order), self.name.encode('utf-8'))
 	class Meta:
 		ordering = ['order']
 	def next(self):

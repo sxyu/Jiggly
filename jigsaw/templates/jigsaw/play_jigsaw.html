@@ -58,6 +58,9 @@
             background-color:#333;
             color:#fff;
         }
+        div.cell p:before{
+			content: attr(content);
+		}
         div.cell p{
             display: block;
             overflow: hidden;
@@ -74,7 +77,7 @@
             user-select: none;
             pointer-events:none;
         }
-        p.top {
+        .top {
             position: absolute;
             top: 6px;
             text-align: center;
@@ -92,7 +95,7 @@
             left:20px;
         }
 
-        p.left {
+        .left {
             -ms-transform: rotate(90deg) translateY(-100%);
             -moz-transform: rotate(90deg) translateY(-100%);
             -webkit-transform: rotate(90deg) translateY(-100%);
@@ -110,7 +113,7 @@
             top: 40px;
         }
 
-        p.right {
+        .right {
             width: 100px;
             float: right;
             -ms-transform: rotate(-90deg) translateY(-100%);
@@ -129,7 +132,7 @@
             text-align: center;
         }
 
-        p.bottom {
+        .bottom {
             position: absolute;
             bottom: -4px;
             text-align: center;
@@ -168,10 +171,23 @@
             line-height:22px;
             vertical-align:middle;
         }
+		#popup-label-1{
+			display:none;
+			position:absolute;
+			top:100px; left:40px;	
+			padding:0.5em 1em;
+				
+			color:white;
+			background-color:#b92;
+			border: 5px solid #970;
+
+			z-index:1100;
+		}
     </style>
 </head>
 <body>
     {% include 'jigsaw/header.html' %}
+	<div id="popup-label-1">Test</div>
     <div id="document-body">
         <div id="screen-header">
             {% if instance.system == True %}
@@ -190,7 +206,7 @@
 			<h5>{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
         </div>
     </div>
-	<div id="main-body">
+	<div id="gameboard">
 	</div>
     {% include 'jigsaw/footer.html' %}
     <script type="text/javascript">
@@ -204,10 +220,51 @@
         var footertext="{{ round.name }} - {{ game.name }} | <em>Jiggly</em> &copy; Alex Yu 2016";
         var Side = {
             LEFT: 0,
-            RIGHT: 1,
-            TOP: 2,
+            TOP: 1,
+            RIGHT: 2,
             BOTTOM: 3,
         };
+        function displayTip(elem){
+			popup = $('#popup-label-1');
+			popup.offset({left:elem.offset().left, top:elem.offset().top});
+			popup.text(elem.attr('content'));
+			popup.css('display', 'block');
+		}
+        function validChild(itm, dir){
+			var id = itm.attr('id').substr(5);
+            var l1, r1, t1, b1;
+            if (rot[id] == 0){
+                l1 = itm.children('.left');
+                r1 = itm.children('.right');
+                t1 = itm.children('.top');
+                b1 = itm.children('.bottom');
+            }
+            else if (rot[id] == 90){
+                l1 = itm.children('.bottom');
+                r1 = itm.children('.top');
+                t1 = itm.children('.left');
+                b1 = itm.children('.right');
+            }
+            else if (rot[id] == 180){
+                l1 = itm.children('.right');
+                r1 = itm.children('.left');
+                t1 = itm.children('.bottom');
+                b1 = itm.children('.top');
+            }
+            else{
+                l1 = itm.children('.top');
+                r1 = itm.children('.bottom');
+                t1 = itm.children('.right');
+                b1 = itm.children('.left');
+            }
+			if (dir == Side.TOP) return t1.attr('content') != null;
+			else if (dir == Side.BOTTOM) return b1.attr('content') != null;
+			else if (dir == Side.LEFT) return l1.attr('content') != null;
+			else if (dir == Side.RIGHT) return r1.attr('content') != null;
+		}
+		function rotSide(dir, times){
+			return (dir+times)%4;
+		}
         function _getSides(id, defs){
             var l1, r1, t1, b1;
             var dragged = $('#cell-' + id);
@@ -237,14 +294,14 @@
             }
             var ret = [];
             if (defs){
-                if (l1 && l1.text())
-                    ret.push([Side.LEFT, l1.text()]);
-                if (r1 && r1.text())
-                    ret.push([Side.RIGHT, r1.text()]);
-                if (t1 && t1.text())
-                    ret.push([Side.TOP, t1.text()]);
-                if (b1 && b1.text())
-                    ret.push([Side.BOTTOM, b1.text()]);
+                if (l1 && l1.attr('content'))
+                    ret.push([Side.LEFT, l1.attr('content')]);
+                if (r1 && r1.attr('content'))
+                    ret.push([Side.RIGHT, r1.attr('content')]);
+                if (t1 && t1.attr('content'))
+                    ret.push([Side.TOP, t1.attr('content')]);
+                if (b1 && b1.attr('content'))
+                    ret.push([Side.BOTTOM, b1.attr('content')]);
             }
             else{
                 if (l1 && l1.attr('wid'))
@@ -267,6 +324,7 @@
                 var pid1 = id1.substr(5);
                 var s1 = _getSides(pid1, false);
                 var i2;
+				var RANGE = 10; // acceptable error range when grading (tiles within this distance will be matched together)
                 for (var i=0; i<s1.length; ++i){
                     var side = s1[i][0], wid = s1[i][1];
 
@@ -274,8 +332,8 @@
                     if (side == Side.LEFT){
                         $('.cell').each(function(){
                             if (this.id != id1 && !id2){
-                                if (Math.abs(dragged.offset().left - $(this).offset().left - dragged.width()) < 5){
-                                    if (Math.abs(dragged.offset().top - $(this).offset().top) < 5){
+                                if (Math.abs(dragged.offset().left - $(this).offset().left - dragged.width()) < RANGE){
+                                    if (Math.abs(dragged.offset().top - $(this).offset().top) < RANGE){
                                         id2 = this.id;
                                         i2 = this;
                                     }
@@ -286,8 +344,8 @@
                     else if (side == Side.RIGHT){
                         $('.cell').each(function(){
                             if (this.id != id1 && !id2){
-                                if (Math.abs($(this).offset().left - dragged.offset().left - dragged.width()) < 5){
-                                    if (Math.abs(dragged.offset().top - $(this).offset().top) < 5){
+                                if (Math.abs($(this).offset().left - dragged.offset().left - dragged.width()) < RANGE){
+                                    if (Math.abs(dragged.offset().top - $(this).offset().top) < RANGE){
                                         id2 = this.id;
                                         i2 = this;
                                     }
@@ -298,8 +356,8 @@
                     else if (side == Side.TOP){
                         $('.cell').each(function(){
                             if (this.id != id1 && !id2){
-                                if (Math.abs(dragged.offset().top - $(this).offset().top - dragged.height()) < 5){
-                                    if (Math.abs(dragged.offset().left - $(this).offset().left) < 5){
+                                if (Math.abs(dragged.offset().top - $(this).offset().top - dragged.height()) < RANGE){
+                                    if (Math.abs(dragged.offset().left - $(this).offset().left) < RANGE){
                                         id2 = this.id;
                                         i2 = this;
                                     }
@@ -310,8 +368,8 @@
                     else if (side == Side.BOTTOM){
                         $('.cell').each(function(){
                             if (this.id != id1 && !id2){
-                                if (Math.abs($(this).offset().top - dragged.offset().top - dragged.height()) < 5){
-                                    if (Math.abs(dragged.offset().left - $(this).offset().left) < 5){
+                                if (Math.abs($(this).offset().top - dragged.offset().top - dragged.height()) < RANGE){
+                                    if (Math.abs(dragged.offset().left - $(this).offset().left) < RANGE){
                                         id2 = this.id;
                                         i2 = this;
                                     }
@@ -338,7 +396,7 @@
         }
 
         var graded = false;
-        // calculate nearby tiles and send to server for grading
+        // find nearby tiles and send to server for grading
         function grade(){
 			if (graded) return;
             diag(
@@ -351,9 +409,9 @@
                         graded = true;
                     });
                 }
-            )
+            );
         }
-        function setText(pside, text) {
+        function setText(pside, text, wid) {
 			if (graded) return;
             var elem = null;
             switch (pside) {
@@ -371,7 +429,9 @@
                     break;
             }
             if (elem) {
-                $(elem).text(text);
+                $(elem).attr('content', text);
+				if (wid)
+					$(elem).attr('wid', wid);
                 return true;
             }
             return false;
@@ -480,29 +540,31 @@
                     for (var i=r; i<r+cellsPerRow; ++i){
                         if (i-cellsPerRow >= words.length || (i < cellsPerRow && i > words.length) ) break;
                         nextCell();
+						var dir = Math.floor(Math.random()*4);
 						if (i != r && i-1 < words.length){
-                            setText(Side.LEFT, words[i-1][1]);
-							if (words[i-1][3] == '0'){
-								$(_lp).attr('wid', words[i-1][2]);
-							}
+							if (words[i-1][3] == '0')
+                            	setText(rotSide(Side.LEFT, dir), words[i-1][1], words[i-1][2]);
+							else
+                            	setText(rotSide(Side.LEFT, dir), words[i-1][1]);
 						}
                         if (i != r+cellsPerRow-1 && i < words.length){
-                            setText(Side.RIGHT, words[i][0]);
-							if (words[i][3] == '1'){
-								$(_rp).attr('wid', words[i][2]);
-							}
+							if (words[i][3] == '1')
+                            	setText(rotSide(Side.RIGHT, dir), words[i][0], words[i][2]);
+							else
+                            	setText(rotSide(Side.RIGHT, dir), words[i][0]);
+							
                         }
 						if (r != 0 && i-5 < words.length){
-                            setText(Side.TOP, words[i-cellsPerRow][1]);
-							if (words[i-cellsPerRow][3] == '0'){
-								$(_tp).attr('wid', words[i-cellsPerRow][2]);
-							}
+							if (words[i-cellsPerRow][3] == '0')
+								setText(rotSide(Side.TOP, dir), words[i-cellsPerRow][1], words[i-cellsPerRow][2]);
+							else
+								setText(rotSide(Side.TOP, dir), words[i-cellsPerRow][1]);
 						}
                         if (i+vwordsPerRow < words.length){
-                            setText(Side.BOTTOM, words[i+vwordsPerRow][0]);
-							if (words[i+vwordsPerRow][3] == '1'){
-								$(_bp).attr('wid', words[i+vwordsPerRow][2]);
-							}
+							if (words[i+vwordsPerRow][3] == '1')
+								setText(rotSide(Side.BOTTOM, dir), words[i+vwordsPerRow][0], words[i+vwordsPerRow][2]);
+							else
+								setText(rotSide(Side.BOTTOM, dir), words[i+vwordsPerRow][0]);
                         }
                     }
                 }
@@ -536,7 +598,6 @@
                     jqcell.after(jqcell.next());
                 }
                 curtop++;
-                rotateImmediate(jqcell, Math.floor(Math.random()*4) * 90);
             });
         }
         var drag='';
@@ -551,6 +612,7 @@
             pt = e.pageY;
             il = e.pageX;
             it = e.pageY;
+			e.stopPropagation();
             e.preventDefault();
         }
         function clabelMouseDown(e){
@@ -577,6 +639,7 @@
                 if (y > $('.page').offset().top + $('.page').height()-dragged.height()+94) y = $('.page').offset().top +$('.page').height()-dragged.height()+94;
                 dragged.offset({ top:y, left:x });
                 e.preventDefault();
+                e.stopPropagation();
             }
         }
         function cellMouseUp(e){
@@ -603,47 +666,71 @@
                                 comp = -Math.pow($(this).css("z-index")*100,2)
                             else
                                 comp = 1
-                            if (Math.abs(Math.abs(dragged.offset().left - $(this).offset().left) - dragged.width()) < 15){
-                                if (Math.abs(dragged.offset().top - $(this).offset().top) < 80){
-                                    comp += Math.pow(Math.abs(dragged.offset().top - $(this).offset().top),2) + Math.pow(Math.abs(Math.abs(dragged.offset().left - $(this).offset().left) - dragged.width()),2);
-                                    if (comp < min){
-                                        mode = 1;
-                                        mincell = $(this);
-                                        min = comp;
-                                    }
-                                }
+                            if (Math.abs(dragged.offset().left - $(this).offset().left - dragged.width()) < 15){ // LEFT
+								if (validChild(dragged, Side.LEFT) && validChild($(this), Side.RIGHT)){
+									if (Math.abs(dragged.offset().top - $(this).offset().top) < 80){
+										comp += Math.pow(Math.abs(dragged.offset().top - $(this).offset().top),2) + Math.pow(Math.abs(Math.abs(dragged.offset().left - $(this).offset().left) - dragged.width()),2);
+										if (comp < min){
+											mode = 1;
+											mincell = $(this);
+											min = comp;
+										}
+									}
+								}
                             }
-                            else if (Math.abs(Math.abs(dragged.offset().top - $(this).offset().top) - dragged.height()) < 15){
-                                if (Math.abs(dragged.offset().left - $(this).offset().left) < 80){
-                                    comp += Math.pow(Math.abs(Math.abs(dragged.offset().top - $(this).offset().top) - dragged.height()),2) + Math.pow(Math.abs(dragged.offset().left - $(this).offset().left),2);
-                                    if (comp < min){
-                                        mode = 2;
-                                        mincell = $(this);
-                                        min = comp;
-                                    }
-                                }
+                            else if (Math.abs($(this).offset().left - dragged.offset().left - dragged.width()) < 15){ // RIGHT
+								if (validChild(dragged, Side.RIGHT) && validChild($(this), Side.LEFT)){
+									if (Math.abs(dragged.offset().top - $(this).offset().top) < 80){
+										comp += Math.pow(Math.abs(dragged.offset().top - $(this).offset().top),2) + Math.pow(Math.abs(Math.abs(dragged.offset().left - $(this).offset().left) - dragged.width()),2);
+										if (comp < min){
+											mode = 1;
+											mincell = $(this);
+											min = comp;
+										}
+									}
+								}
+                            }
+                            else if (Math.abs(dragged.offset().top - $(this).offset().top - dragged.height()) < 15){ // TOP
+								if (validChild(dragged, Side.TOP) && validChild($(this), Side.BOTTOM)){
+									if (Math.abs(dragged.offset().left - $(this).offset().left) < 80){
+										comp += Math.pow(Math.abs(Math.abs(dragged.offset().top - $(this).offset().top) - dragged.height()),2) + Math.pow(Math.abs(dragged.offset().left - $(this).offset().left),2);
+										if (comp < min){
+											mode = 2;
+											mincell = $(this);
+											min = comp;
+										}
+									}
+								}
+                            }
+                            else if (Math.abs($(this).offset().top - dragged.offset().top - dragged.height()) < 15){ // BOTTOM
+								if (validChild(dragged, Side.BOTTOM) && validChild($(this), Side.TOP)){
+									if (Math.abs(dragged.offset().left - $(this).offset().left) < 80){
+										comp += Math.pow(Math.abs(Math.abs(dragged.offset().top - $(this).offset().top) - dragged.height()),2) + Math.pow(Math.abs(dragged.offset().left - $(this).offset().left),2);
+										if (comp < min){
+											mode = 2;
+											mincell = $(this);
+											min = comp;
+										}
+									}
+								}
                             }
                         }
                     })
-                    if (mode != 0){
-                        mincell.css("z-index", curtop);
-                        curtop ++;
-                    }
                     var x=dragged.offset().left, y = dragged.offset().top;
                     if (mode == 1){
                         if (dragged.offset().left < mincell.offset().left){
-                            x= mincell.offset().left-mincell.width(); y= mincell.offset().top;
+                            x= mincell.offset().left-mincell.width()-1; y= mincell.offset().top;
                         }
                         else{
-                            x= mincell.offset().left+mincell.width(); y= mincell.offset().top;
+                            x= mincell.offset().left+mincell.width()+1; y= mincell.offset().top;
                         }
                     }
                     else if (mode == 2){
                         if (dragged.offset().top < mincell.offset().top){
-                            x= mincell.offset().left; y= mincell.offset().top-mincell.height();
+                            x= mincell.offset().left; y=mincell.offset().top-mincell.height()-1;
                         }
                         else{
-                            x= mincell.offset().left; y= mincell.offset().top+mincell.height();
+                            x= mincell.offset().left; y=mincell.offset().top+mincell.height()+1;
                         }
                     }
                     if (x < 0) x = 0;
@@ -652,19 +739,44 @@
                     if (y > $('.page').offset().top + $('.page').height()-dragged.height()+94) y = $('.page').offset().top +$('.page').height()-dragged.height()+94;
                     var change = true;
                     $('.cell').each(function(){
-                        if ($(this).offset().left == x && $(this).offset().top == y){
+                        if (Math.abs($(this).offset().left - x) < 5  && Math.abs($(this).offset().top - y) < 5){
                             change = false;
+							return;
                         }
                     });
-                    if (change) dragged.offset({left:x, top:y});
+					if (change){
+						//if (mode != 0){
+						//	mincell.css("z-index", curtop);
+						//	curtop ++;
+						//}
+					   	dragged.offset({left:x, top:y});
+					}
                 }
             }
             drag = '';
             e.preventDefault();
         }
+		var pdrag = false;
+		var ppx, ppy;
+		function pageMouseDown(e){
+			pdrag = true;
+			ppx = e.pageX;
+			ppy = e.pageY;
+		}
+		function pageMouseMove(e){
+			if (pdrag){
+				$(window).scrollTop($(window).scrollTop() + (ppy - e.pageY));
+				$(window).scrollLeft($(window).scrollLeft() + (ppx - e.pageX));
+			}
+            e.preventDefault();
+		}
+		function pageMouseUp(e){
+			pdrag = false;
+            e.preventDefault();
+		}
         $(document).ready(function () {
 			$('body').css('zoom', '100%');
-            body = document.getElementById('main-body');
+            body = document.getElementById('gameboard');
             $('#btn-grade').click(grade);
             window.addEventListener("keydown",function (e) {
                 if ((e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) && !graded) {
@@ -691,8 +803,9 @@
                     $(this).contextmenu(function(){ return false });
                 })
                 $(document).mouseup(cellMouseUp);
-                $('.page').mousedown(function(e){e.preventDefault()});
-                $('.page').mousemove(function(e){e.preventDefault()});
+                $('.page').mousedown(pageMouseDown);
+                $('.page').mousemove(pageMouseMove);
+                $('.page').mouseup(pageMouseUp);
             });
         })
     </script>

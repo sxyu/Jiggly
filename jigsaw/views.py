@@ -206,6 +206,9 @@ def printDoc(request, gid, id):
     else:
         raise Http404
 
+def redir(request, url):
+	return HttpResponseRedirect(url)
+
 def changeLang(request):
     if request.method == "GET":
         if 'code' in request.GET:
