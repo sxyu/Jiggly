@@ -1,0 +1,9 @@
+Website for creating jigsaw/matching puzzle games from vocabulary lists.
+URL: https://jiggly.tk
+
+Teachers can start games that students may then join through the website using a code.
+As the students play the teacher is able to see the scores of each student. They are also able to access a report with detailed information about the performance of individual players.
+
+The website requires no log-in and uses cookies to store persistent data identifying games owned. Each game has an unique hash though which one may access the game from another computer.
+
+Copyright Alex (Sixian) Yu. All rights reserved.
