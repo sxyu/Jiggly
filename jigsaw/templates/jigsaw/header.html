@@ -60,7 +60,7 @@
                         {% else %}
                         <ul class="nav navbar-nav navbar-right">
                             <li{% if p_join %} class="active" {% endif %}>
-                                <a style="cursor:default">{% if supervisor %}{% trans 'Hosting: ' %}{% else %}{% trans 'In Game: ' %}{% endif %}{% if instance.system %}{% trans "Preview / Practice Game" %}{% else %}{{ instance.alias }}{% endif %}</a></li>
+                                <a style="cursor:default" class="no-select">{% if supervisor %}{% trans 'Hosting: ' %}{% else %}{% trans 'In Game: ' %}{% endif %}{% if instance.system %}{% trans "Preview / Practice Game" %}{% else %}{{ instance.alias }}{% endif %}</a></li>
                                 {% endif %}
                         </ul>
         </div><!-- nav -->

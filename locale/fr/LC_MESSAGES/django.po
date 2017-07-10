@@ -268,7 +268,7 @@ msgstr "Imprimer"
 #: jigsaw/templates/jigsaw/game.html:110 jigsaw/templates/jigsaw/round.html:15
 #: jigsaw/templates/jigsaw/round.html:17
 msgid "Round Name"
-msgstr "Nom de tour"
+msgstr "Nom du tour"
 
 #: jigsaw/templates/jigsaw/game.html:112 jigsaw/templates/jigsaw/round.html:22
 msgid "Round type"

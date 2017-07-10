@@ -90,26 +90,37 @@ def newGame(request):
 def game(request, id):
     g = get_object_or_404(Game, key=id)
     glist = request.COOKIES.get('recentgames')
+
     nglist = []
     if glist:
         glist = glist.split('\\')
         for x in glist:
             if x != id:
                 nglist += [x]
+
     cg = request.COOKIES.get('gameid') 
+
     if cg and cg >= 0 and Game.objects.filter(key=cg).exists() and not cg == g.key:
         nglist += [cg]
+
     g.normalizeOrder()
     g.deleteStaleInstances()
+
     if g.instances.all().count():
-        started = True
+        if request.GET and 'clear' in request.GET:
+            g.instances.all().delete()
+            started = False
+        else:
+            started = True
     else:
         started = False
+
     if len(nglist) and not cg == g.key:
         r = render(request, 'jigsaw/game.html', {'p_newgame':True, 'game':g, 'recent': [Game.objects.get(key=x) for x in nglist], 'started': started})
         _setCookie(r, 'recentgames', "\\".join(nglist))
     else:
         r = render(request, 'jigsaw/game.html', {'p_newgame':True, 'game':g, 'recent': _recentGames(request), 'started':started})
+
     _setCookie(r, 'gameid', g.key)
     return _autoDelSession(request, r)
 

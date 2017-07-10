@@ -39,7 +39,11 @@
             margin-top:3em;
             height:100%;
             min-height:500px;
-            background: url("{% static 'images/spring_bokeh.jpg' %}") no-repeat center center;
+            background: url("{% static 'images/ferry_bokeh.jpg' %}") no-repeat 34% bottom, #a35218;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
             background-size:cover;
             width:100%;
             min-width:1200px;
@@ -79,7 +83,6 @@
 			padding: 10px 25px;
 			line-height: 4em;
 			margin: 25px 0;
-			border-radius: 7px;
 			border: 4px solid transparent;
 			white-space: nowrap;
 			-o-text-overflow: ellipsis;
@@ -148,10 +151,10 @@
 <body>
     {% include 'jigsaw/header.html' %}
     <div id="document-body">
-        <div id="screen-header">
+        <div id="screen-header" class="no-select">
             {% if instance.system == True %}
-			<h4>{% trans 'Preview / Practice Game' %}</h4>{% else %}
-            <h4>{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
+			<h4 class="no-select">{% trans 'Preview / Practice Game' %}</h4>{% else %}
+            <h4 class="no-select">{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
             <button class="btn btn-primary" style="margin-right:10px; vertical-align:middle" id="btn-grade" title="{% trans 'Submit + Score' %}">
                 <span class="glyphicon glyphicon-edit"></span>
                 {% trans "Submit + Score" %}
@@ -160,13 +163,13 @@
                 <span class="glyphicon glyphicon-log-out"></span>
                 {% trans "Quit" %}
             </button>
-            <h3>{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
-			<h4>{% trans 'Type: ' %} <span id="lb-size"></span> {% trans 'Matching' %}&nbsp; {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
-			<h5>{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
+            <h3 class="no-select">{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
+			<h4 class="no-select">{% trans 'Type: ' %} <span id="lb-size"></span> {% trans 'Matching' %} &nbsp; {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
+			<h5 class="no-select">{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
         </div>
     </div>
 	<div class="page">
-		<div id="lists">
+		<div id="lists" class="no-select">
 			<ul id="list-l">
 			</ul>
 			<ul id="list-r">
@@ -345,7 +348,7 @@
 			var ret = "";
 			for (var w in link){
 				if (!w) continue;
-				ret += id[w] + '\\' + $('#'+link[w]).attr('content') + '\n';
+				ret += id[w] + '\\' + $('#'+link[w]).children('p').attr('content') + '\n';
 			}
 			return ret;
 		}

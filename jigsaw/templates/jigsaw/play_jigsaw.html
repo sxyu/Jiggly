@@ -5,6 +5,7 @@
 <head>
     {% include 'jigsaw/resources.html' %}
 	<title>{% trans 'Jigsaw Round: '%}{{ round.name|safe }} - {{ game.name|safe }} | Jiggly</title>
+
     <style type="text/css">
         div#site-banner {
             background: url("{% static 'images/mosaic_1.jpg' %}") no-repeat right bottom, #8C8CAF;
@@ -19,6 +20,7 @@
             border-radius: 0;
             position: relative;
         }
+
         body{
             background-color:#3a3a3a;
         }
@@ -27,7 +29,7 @@
         }
         #site-footer {
             width:100%;
-            min-width:3840px;
+            min-width:1914px;
         }
         #document-body{
             padding-top:6em;
@@ -39,35 +41,41 @@
             margin-top:3em;
             padding:0.5in;
             height:100%;
-            min-height: 2160px;
-            background: url("{% static 'images/spring_bokeh.jpg' %}") no-repeat center center;
+            min-height: 1080px;
+            background: url("{% static 'images/ferry_bokeh.jpg' %}") no-repeat center center, #a35218;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+            -webkit-background-size: cover;
             background-size:cover;
             width:100%;
-            min-width:3840px;
+            min-width:1914px;
         }
+
         div.cell {
             display:inline-block;
-            width: 180px;
-            height: 180px;
+            width: 140px;
+            height: 140px;
             position: absolute;
             margin:0;
             margin-left:-1px;
             margin-top:-5px;
             padding:0;
-            border: 1px solid #333;
             background-color:#333;
             color:#fff;
         }
+		
         div.cell p:before{
 			content: attr(content);
 		}
+
         div.cell p{
             display: block;
             overflow: hidden;
             -ms-text-overflow: ellipsis;
             -o-text-overflow: ellipsis;
             text-overflow: ellipsis;
-            font-size:12px;
+            font-size:10px;
             cursor:default;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -77,11 +85,12 @@
             user-select: none;
             pointer-events:none;
         }
+
         .top {
             position: absolute;
             top: 6px;
             text-align: center;
-            width: 140px;
+            width: 120px;
             -moz-transform: rotate(180deg);
             -ms-transform: rotate(180deg);
             -o-transform: rotate(180deg);
@@ -92,7 +101,7 @@
             -o-transform-origin: 50% 50%;
             -webkit-transform-origin: 50% 50%;
             transform-origin: 50% 50%;
-            left:20px;
+            left:10px;
         }
 
         .left {
@@ -110,7 +119,7 @@
             position: absolute;
             text-align: center;
             left: 6px;
-            top: 40px;
+            top: 20px;
         }
 
         .right {
@@ -128,7 +137,7 @@
             transform-origin: right top 0;
             position: absolute;
             right: 6px;
-            top: 40px;
+            top: 20px;
             text-align: center;
         }
 
@@ -136,8 +145,8 @@
             position: absolute;
             bottom: -4px;
             text-align: center;
-            width:140px;
-            left:20px;
+            width:120px;
+            left:10px;
         }
 
         div#screen-header {
@@ -189,21 +198,22 @@
     {% include 'jigsaw/header.html' %}
 	<div id="popup-label-1">Test</div>
     <div id="document-body">
-        <div id="screen-header">
+        <div id="screen-header" class="no-select">
             {% if instance.system == True %}
-			<h4>{% trans 'Preview / Practice Game' %}</h4>{% else %}
-            <h4>{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
-            <button class="btn btn-primary" style="margin-right:10px; vertical-align:middle" id="btn-grade" title="{% trans 'Submit + Score' %}">
-                <span class="glyphicon glyphicon-edit"></span>
+			<h4 class="no-select">{% trans 'Preview / Practice Game' %}</h4>{% else %}
+            <h4 class="no-select">{% trans 'Playing:' %} {{ instance.alias|safe }}</h4>{% endif %}
+            <button class="btn btn-primary no-select" style="margin-right:10px; vertical-align:middle" id="btn-grade" title="{% trans 'Submit + Score' %}">
+                <span class="glyphicon glyphicon-edit no-select"></span>
                 {% trans "Submit + Score" %}
             </button>
-            <button class="btn btn-warning" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="promptQuit()">
-                <span class="glyphicon glyphicon-log-out"></span>
+            <button class="btn btn-warning no-select" style="vertical-align:middle" id="btn-leave" title="{% trans 'Quit' %}" onclick="promptQuit()">
+                <span class="glyphicon glyphicon-log-out no-select"></span>
                 {% trans "Quit" %}
             </button>
-            <h3>{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
-			<h4>{% trans 'Type: ' %} <span id="lb-size"></span> {% trans 'Jigsaw' %}&nbsp; {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
-			<h5>{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
+
+            <h3 class="no-select">{{ round.name|safe }} ({{ round.order }}/{{ game.rounds.all|length }}) - {{ game.name|safe }}</h3>
+			<h4 class="no-select">{% trans 'Type: ' %} <span id="lb-size"></span> {% trans 'Jigsaw' %}&nbsp; {% trans 'Points: ' %} {{ round.maxPoints }}</h4>
+			<h5 class="no-select">{% trans 'You are: ' %} {{ player.name|safe }} ({{ player.points }} {% trans "Points" %})</h5>
         </div>
     </div>
 	<div id="gameboard">
@@ -484,8 +494,8 @@
             var sw=screen.width*1.2, sh= screen.height*1.2;
             if (sw < 1000) sw = 1000; 
             if (sh < 800) sh = 800;
-            jqcell.css('left', Math.random() * (Math.min($(curpage).width(), sw) - 245));
-            jqcell.css('top', Math.random() * (Math.min($(curpage).height(), sh) - 82));
+            jqcell.css('left', Math.max(Math.random() * (Math.min($(curpage).width(), sw) - 245), 0));
+            jqcell.css('top', Math.max(Math.random() * (Math.min($(curpage).height(), sh) - 82), 0));
             rgba = "rgba(" + Math.round(Math.random() * 255) + ", " + Math.round(Math.random() * 255) + "," + Math.round(Math.random() * 255) + ",0.7)";
             jqcell.css('background', rgba);
             jqcell.addClass('cell');
@@ -517,6 +527,7 @@
 			if (graded) return;
             nextPage();
             nextRow();
+
             if (!words.length) {
                 $('#lb-size').text(0 + 'x' + cells);
                 return;
@@ -530,6 +541,7 @@
             else if (words.length <= 24){
                 cellsPerRow=4;
             }
+
             var vwordsPerRow = cellsPerRow-1;
             var wordsPerRow = 2*cellsPerRow-1;
             var cellsPerPage = (cellsPerRow-1) * rowsPerPage + (rowsPerPage-1) * cellsPerRow;
@@ -577,6 +589,7 @@
                 $('#lb-size').text(rows + 'x' + cellsPerRow);
             }
             a = $('.cell');
+
             var j, x, i;
             for (i = a.length; i; i -= 1) {
                 j = Math.floor(Math.random() * i);
@@ -584,6 +597,7 @@
                 a[i - 1] = a[j];
                 a[j] = x;
             }
+
             a.each(function(){
                 jqcell = $(this);
                 jqcell.attr('id', 'cell-' + _cid);
@@ -600,9 +614,11 @@
                 curtop++;
             });
         }
+
         var drag='';
         var pl, pt, il, it;
         var curtop = 1;
+
         function cellMouseDown(e){
 			if (graded) return;
             drag = e.target.id;
@@ -615,6 +631,7 @@
 			e.stopPropagation();
             e.preventDefault();
         }
+
         function clabelMouseDown(e){
 			if (graded) return;
             drag = $(this).parent().attr('id');
@@ -719,18 +736,18 @@
                     var x=dragged.offset().left, y = dragged.offset().top;
                     if (mode == 1){
                         if (dragged.offset().left < mincell.offset().left){
-                            x= mincell.offset().left-mincell.width()-1; y= mincell.offset().top;
+                            x= mincell.offset().left-mincell.width(); y= mincell.offset().top;
                         }
                         else{
-                            x= mincell.offset().left+mincell.width()+1; y= mincell.offset().top;
+                            x= mincell.offset().left+mincell.width(); y= mincell.offset().top;
                         }
                     }
                     else if (mode == 2){
                         if (dragged.offset().top < mincell.offset().top){
-                            x= mincell.offset().left; y=mincell.offset().top-mincell.height()-1;
+                            x= mincell.offset().left; y=mincell.offset().top-mincell.height();
                         }
                         else{
-                            x= mincell.offset().left; y=mincell.offset().top+mincell.height()+1;
+                            x= mincell.offset().left; y=mincell.offset().top+mincell.height();
                         }
                     }
                     if (x < 0) x = 0;
@@ -756,13 +773,16 @@
             drag = '';
             e.preventDefault();
         }
+
 		var pdrag = false;
 		var ppx, ppy;
+
 		function pageMouseDown(e){
 			pdrag = true;
 			ppx = e.pageX;
 			ppy = e.pageY;
 		}
+
 		function pageMouseMove(e){
 			if (pdrag){
 				$(window).scrollTop($(window).scrollTop() + (ppy - e.pageY));
@@ -770,10 +790,12 @@
 			}
             e.preventDefault();
 		}
+
 		function pageMouseUp(e){
 			pdrag = false;
             e.preventDefault();
 		}
+
         $(document).ready(function () {
 			$('body').css('zoom', '100%');
             body = document.getElementById('gameboard');
@@ -792,16 +814,19 @@
                 }
                 layoutWords(words);
                 words = null
+
                 $('.cell').each(function(){
                     $(this).mousedown(cellMouseDown);
                     $(this).mousemove(cellMouseMove);
                     $(this).mouseup(cellMouseUp);
                     $(this).contextmenu(function(){ return false });
                 })
+
                 $('.cell p').each(function(){
                     $(this).mousedown(clabelMouseDown);
                     $(this).contextmenu(function(){ return false });
                 })
+
                 $(document).mouseup(cellMouseUp);
                 $('.page').mousedown(pageMouseDown);
                 $('.page').mousemove(pageMouseMove);

@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load i18n %}
 <div id="site-footer">
-	<span>{% trans "Copyright" %} <span class="sans-serif">&copy;</span> Jiggly / {% trans 'Alex Yu' %} 2016</span>
+	<span>{% trans "Copyright" %} <span class="sans-serif">&copy;</span> Jiggly / {% trans 'Alex Yu' %} 2016-17</span>
 </div>
 <div id="diag-confirm" style="display:none; text-align:center">
     <h3 id="cf-title"></h3>
@@ -119,11 +119,8 @@
             "{% trans 'Are you sure you want to leave the game? You will not be able to come back to it without restarting.' %}",
             function(){
                 noCloseWarning = true; 
-				{% if instance.system or supervisor %}
-				window.location.href = "/redir/{% url 'game' instance.game.key %}/?clear=true";
-				{% else %}
-				window.location.href = "/redir/{% url 'index' %}/?clear=true";
-				{% endif %}
+				{% if instance.system or supervisor %}window.location.href = "{% url 'game' instance.game.key %}?clear=true";
+				{% else %}window.location.href = "{% url 'index' %}?clear=true"; {% endif %}
             }
         )
     }
@@ -178,7 +175,7 @@
                     function(){
                         noCloseWarning = true;
 						if (content == "2")
-							window.location.href ="/redir///?clear=true";
+							window.location.href ="/?clear=true";
 						else
 							window.location.href ="{% url 'scoreboard' %}";
                     }
@@ -197,7 +194,7 @@
                     setPermCookie('instancemankey', '');
                     setPermCookie('psessionid', '');
 					noCloseWarning = true; 
-					window.location.href = "/redir/{% url 'game' game.key %}/?clear=true";
+					window.location.href = "{% url 'game' game.key %}?clear=true";
                 });
             }
         );
@@ -262,10 +259,12 @@
         curgame = getCookie("gameid")
         cursession = getCookie("psessionid")
         curinstance = getCookie("instanceid")
-        document.addEventListener("touchstart", touchhandler, true);
-        document.addEventListener("touchmove", touchhandler, true);
-        document.addEventListener("touchend", touchhandler, true);
-        document.addEventListener("touchcancel", touchhandler, true);
+
+        document.body.addEventListener("touchstart", touchhandler, {passive:false});
+        document.body.addEventListener("touchmove", touchhandler, {passive:false});
+        document.body.addEventListener("touchend", touchhandler, {passive:false});
+        document.body.addEventListener("touchcancel", touchhandler, {passive:false});
+
         {% if in_game %}
         window.addEventListener("beforeunload", function (e) {
             if (!noCloseWarning){
